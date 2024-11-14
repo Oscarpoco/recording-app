@@ -1,20 +1,74 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native';
+
+// CUSTOM SCREENS
+
+import Record from './screens/RecordScreen';
+import Recordings from './screens/recordingsScreen';
+import Splash from './screens/splashScreen';
+import Play from './screens/PlayingAudio';
+
+// ENDS
+
+// USE STATE
+
+import { useState } from 'react';
+
+// ENDS
 
 export default function App() {
+
+  // STATES
+
+  const [view, setView] = useState('recording');
+
+  // ENDS
+
+
+  // FUNCTION TO MANIPULATE THE VIEW STATE 
+
+  const changeView = (view) => {
+    setView(view);
+    }
+
+  // ENDS
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+
+    <SafeAreaView style={styles.container}>
+
+        {/* RENDERING SCREENS */}
+
+          {
+            view === 'splash' ? (<Splash/>) // SPLASH SCREEN
+
+          : view === 'record' ? (<Record/>) // RECORD SCREEN
+
+          : view === 'recording' ? (<Recordings/>) // RECORDINGS SCREEN
+          
+          : (<Play/>) //PLAY SCREEN
+
+          }
+
+        {/* ENDS */}
+        
+        {/* STATUSBAR */}
+          <StatusBar style="light" />
+        {/* ENDS */}
+
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+
+  container: 
+  {
     flex: 1,
-    backgroundColor: '#fff',
+    width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
   },
+
 });

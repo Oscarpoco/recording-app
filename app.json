@@ -19,10 +19,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.oscarpoco.recordingapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "7e92319c-1de4-4dae-8cb0-9512c1f98b2c"
+      }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }
