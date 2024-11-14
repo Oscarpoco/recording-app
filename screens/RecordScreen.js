@@ -2,7 +2,7 @@
 import { StyleSheet, Text, View, Pressable, TextInput } from 'react-native';
 
 // ICONS
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -48,15 +48,15 @@ export default function Record() {
             <View style = {styles.navParent}>
 
                 <View style = {styles.navChild}>
-                    <MaterialIcons name="cancel" size={30} color="#B600FF" />
+                    <Entypo name="cross" size={30} color="#333" />
                 </View>
 
                 <View style = {styles.navSibling}>
-                    <MaterialCommunityIcons name="record-circle" size={60} color="#FF0000" />
+                    <MaterialCommunityIcons name="record-circle" size={50} color="#FF0000" />
                 </View>
 
                 <View style = {styles.navChild}>
-                    <Ionicons name="checkmark-done-sharp" size={30} color="#03FF3E" />
+                    <MaterialIcons name="done" size={30} color="#333" />
                 </View>
 
             </View>
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     // NAVIGATION
     navParent:
     {
-        backgroundColor: '#333',
+        // backgroundColor: '#333',
         width: '100%',
         paddingVertical: 7,
         borderRadius: 20,
@@ -102,9 +102,9 @@ const styles = StyleSheet.create({
 
     navChild:
     {
-        width: 60 , height: 60,
+        width: 50 , height: 50,
         borderRadius: 50,
-        backgroundColor: '#83888E45',
+        backgroundColor: '#079AE9',
         justifyContent: 'center',
         alignItems: 'center',
     },

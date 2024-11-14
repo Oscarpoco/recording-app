@@ -8,7 +8,7 @@ const MusicPlayer = () => {
   useEffect(() => {
     Animated.timing(progress, {
       toValue: 1,
-      duration: 10000, // Adjust for desired progress duration (e.g., 10 seconds)
+      duration: 100000, // Adjust for desired progress duration (e.g., 10 seconds)
       useNativeDriver: false, // Required for width animation
     }).start();
   }, [progress]);

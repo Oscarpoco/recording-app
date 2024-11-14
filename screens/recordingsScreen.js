@@ -6,9 +6,8 @@ import { useState, useEffect } from 'react';
 
 
 // ICONS
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import AntDesign from 'react-native-vector-icons/AntDesign';
+import Entypo from 'react-native-vector-icons/Entypo';
 import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -26,8 +25,8 @@ export default function Recordings() {
 
             {/* TOP NAVIGATION */}
                 <View style={styles.topNav}>
-                    <Ionicons name="chevron-back" size={30} color="#03FF3E" />
-                    <Octicons name="share" size={30} color="#03FF3E" />
+                    <Ionicons name="chevron-back" size={30} color="#fff" />
+                    <Octicons name="share" size={25} color="#fff" marginRight = '5' />
                 </View>
             {/* TOP NAVIGATION ENDS */}
 
@@ -43,7 +42,7 @@ export default function Recordings() {
 
             <View style={styles.visualization}>
                 <MaterialCommunityIcons name="waveform" size={90} color="#03FF3E" />
-                <MaterialCommunityIcons name="waveform" size={150} color="#B600FF" />
+                <MaterialCommunityIcons name="waveform" size={170} color="#B600FF" />
                 <MaterialCommunityIcons name="waveform" size={90} color="#FF0000" />
             </View>
 
@@ -71,15 +70,15 @@ export default function Recordings() {
             <View style={styles.navParent}>
 
                 <View style={styles.navChild}>
-                    <AntDesign name="stepbackward" size={30} color="#000" />
+                    <Entypo name="ccw" size={25} color="#000" />
                 </View>
 
                 <View style={styles.navSibling}>
-                    <FontAwesome5 name="play" size={40} color="#03FF3E" />
+                    <MaterialCommunityIcons name="play-circle" size={50} color="#03FF3E" />
                 </View>
 
                 <View style={styles.navChild}>
-                    <AntDesign name="stepforward" size={30} color="#000" />
+                    <Entypo name="cw" size={25} color="#000" />
                 </View>
 
             </View>
@@ -110,7 +109,7 @@ const styles = StyleSheet.create({
     // NAVIGATION
     navParent:
     {
-        backgroundColor: '#333',
+        // backgroundColor: '#333',
         width: '100%',
         paddingVertical: 7,
         borderRadius: 20,
@@ -124,7 +123,7 @@ const styles = StyleSheet.create({
 
     navChild:
     {
-        width: 60, height: 60,
+        width: 50, height: 50,
         borderRadius: 50,
         backgroundColor: '#079AE9',
         justifyContent: 'center',
@@ -167,20 +166,20 @@ const styles = StyleSheet.create({
     button:
     {
         backgroundColor: '#83888E45',
-        paddingVertical: 5,
-        paddingHorizontal: 15,
+        paddingVertical: 7,
+        paddingHorizontal: 20,
         borderRadius: 50,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 3,
+        gap: 4,
         marginBottom: 10
     },
 
     buttonText:
     {
-        fontWeight: 'bold',
-        fontSize: 20,
+        fontWeight: '900',
+        fontSize: 18,
         letterSpacing: 2,
         color: '#fff'
     },
@@ -212,5 +211,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        marginBottom: 40,
+        padding: 10,
+        borderRadius: 10,
     }
 });
