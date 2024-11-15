@@ -21,7 +21,7 @@ export default function App() {
 
   // STATES
 
-  const [view, setView] = useState('record');
+  const [view, setView] = useState('play');
 
   // ENDS
 
