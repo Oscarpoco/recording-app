@@ -16,7 +16,7 @@ import MusicPlayer from './ProgressBar';
 
 
 
-export default function Recordings() {
+export default function Recordings({changeView}) {
 
 
 
