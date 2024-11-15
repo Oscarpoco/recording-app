@@ -26,6 +26,7 @@ export default function App() {
 
   const [recordings, setRecordings] = useState([]);
   const [view, setView] = useState('splash');
+  const [selectedAudio, setSelectedAudio] = useState(null);
   const opacity = useRef(new Animated.Value(1)).current;
 
   // ENDS

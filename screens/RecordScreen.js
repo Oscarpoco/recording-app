@@ -179,10 +179,10 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
         flexDirection: 'column',
         backgroundColor: '#000',
-        paddingVertical: 20,
+        paddingVertical: 10,
         paddingHorizontal: 10,
         gap: 30
     },
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
         fontSize: 50,
         fontWeight: 'bold',
         letterSpacing: 5,
-        marginBottom: 50,
+        marginBottom: 30,
         color: '#fff'
     },
 
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
         fontSize: 30,
         fontWeight: 'bold',
         letterSpacing: 5,
-        marginBottom: 30,
+        marginBottom: 50,
         borderWidth: 2,
         borderColor: '#333',
         borderRadius: 10,
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        marginBottom: 50,
+        marginTop: 40,
     }
 
 });

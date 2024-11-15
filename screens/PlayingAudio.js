@@ -23,16 +23,38 @@ import { Audio } from 'expo-av';
 
 export default function Play({ changeView, recordings }) {
   const [sound, setSound] = useState();
+  const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
 
 
    // Play a recording
-   const playRecording = async (uri) => {
+   const playRecording = async (uri, key) => {
     try {
-      const { sound } = await Audio.Sound.createAsync({ uri });
-      setSound(sound);
-      await sound.playAsync();
+      if (sound) {
+        await sound.stopAsync();
+        await sound.unloadAsync();
+        setSound(null);
+        setCurrentlyPlaying(null);
+      }
+
+      const { sound: newSound } = await Audio.Sound.createAsync({ uri });
+      setSound(newSound);
+      setCurrentlyPlaying(key);
+      await newSound.playAsync();
     } catch (error) {
       console.error('Failed to play recording', error);
+      Alert.alert('Error', 'Failed to play the recording.');
+    }
+  };
+
+  // Stop the playback
+  const stopPlayback = async () => {
+    try {
+      if (sound) {
+        await sound.stopAsync();
+        setCurrentlyPlaying(null);
+      }
+    } catch (error) {
+      console.error('Failed to stop playback', error);
     }
   };
 
@@ -46,51 +68,58 @@ export default function Play({ changeView, recordings }) {
   }, [sound]);
 
   return (
+    <View style={styles.allRecordingsParent}>
+      {/* TOP NAVIGATION */}
+      <View style={styles.searchParent}>
+        <Octicons name="search" size={25} color="#fff" />
+        <TextInput
+          placeholder="Search your recordings"
+          placeholderTextColor="#fff"
+          selectionColor="#333"
+          style={styles.searchInput}
+        />
+      </View>
+      {/* TOP NAVIGATION ENDS */}
 
-        <View style={styles.allRecordingsParent}>
-
-        {/* TOP NAVIGATION */}
-        <View style={styles.searchParent}>
-            <Octicons name="search" size={25} color="#fff" />
-            <TextInput
-            placeholder="Search your recordings"
-            placeholderTextColor="#fff"
-            selectionColor="#333"
-            style={styles.searchInput}
-            />
-        </View>
-        {/* TOP NAVIGATION ENDS */}
-
-        {/* ALL RECORDINGS */}
-        <View style={styles.myRecordings}>
-            <ScrollView style={styles.list}>
-            {recordings.map((recording) => (
-                <Pressable key={recording.key} >
-                <View style={styles.recordingItem}>
-                    <Text style={styles.recordingText}>{recording.title}</Text>
-                    <Text style={styles.recordingDuration}>
-                    {new Date(recording.duration * 1000).toISOString().substr(11, 8)}
-                    </Text>
-                    <Pressable style={styles.playButton}>
-                        {/* <FontAwesome6 name="trash-alt" size={20} color="#fff" /> */}
-                        <FontAwesome6 name="play" size={20} color="#fff" onPress={() => playRecording(recording.uri)}/>
-                    </Pressable>
-                </View>
+      {/* ALL RECORDINGS */}
+      <View style={styles.myRecordings}>
+        <ScrollView style={styles.list}>
+          {recordings.map((recording) => (
+            <Pressable key={recording.key}>
+              <View style={styles.recordingItem}>
+                <Text style={styles.recordingText}>{recording.title || 'Untitled'}</Text>
+                <Text style={styles.recordingDuration}>
+                  {new Date(recording.duration * 1000).toISOString().substr(11, 8)}
+                </Text>
+                <Pressable
+                  style={styles.playButton}
+                  onPress={() =>
+                    currentlyPlaying === recording.key
+                      ? stopPlayback()
+                      : playRecording(recording.uri, recording.key)
+                  }
+                >
+                  <FontAwesome6
+                    name={currentlyPlaying === recording.key ? 'stop' : 'play'}
+                    size={20}
+                    color="#fff"
+                  />
                 </Pressable>
-            ))}
-            </ScrollView>
-        </View>
-        {/* ENDS */}
+              </View>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </View>
+      {/* ALL RECORDINGS ENDS */}
 
-        {/* RECORD BUTTON */}
-        <Pressable onPress={() => changeView('record')}>
-            <View style={styles.navSibling}>
-            <MaterialCommunityIcons name="record-circle" size={50} color="#FF0000" />
-            </View>
-        </Pressable>
-        {/* ENDS */}
+      {/* RECORD BUTTON */}
+      <Pressable onPress={() => changeView('record')}>
+        <View style={styles.navSibling}>
+          <MaterialCommunityIcons name="record-circle" size={50} color="#FF0000" />
         </View>
- 
+      </Pressable>
+      {/* RECORD BUTTON ENDS */}
+    </View>
   );
 }
 
