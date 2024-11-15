@@ -5,6 +5,8 @@ import { StyleSheet, Text, View, Pressable, TextInput, Alert } from 'react-nativ
 import { useState, useRef  } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// EXPO
+import { Audio } from 'expo-av';
 
 // ICONS
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -18,138 +20,155 @@ export default function Record({changeView}) {
     const [isRecording, setIsRecording] = useState(false);
     const [time, setTime] = useState(0);
     const intervalRef = useRef(null);
-
-     // Start recording function
-  const startRecording = () => {
-    if (!title) {
-      Alert.alert("Please enter a title to start recording.");
-      return;
-    }
-
-    setIsRecording(true);
-    setTime(0);
-    intervalRef.current = setInterval(() => setTime(prev => prev + 1), 1000);
-  };
-
-  // Stop recording function
-  const stopRecording = () => {
-    setIsRecording(false);
-    clearInterval(intervalRef.current);
-  };
-
-  // Cancel recording function
-  const cancelRecording = () => {
-    if (isRecording) stopRecording();
-    setTime(0);
-  };
-
-  // Save recording function
-  const saveRecording = async () => {
-    if (!title) {
-      Alert.alert("Please enter a title before saving.");
-      return;
-    }
-    stopRecording();
-
-    const recordingData = {
-      title,
-      duration: time,
-      timestamp: new Date().toISOString()
+    const [recording, setRecording] = useState(null); // Current recording instance
+    const [recordedURI, setRecordedURI] = useState(null); // URI of the saved recording
+  
+    // Start recording function
+    const startRecording = async () => {
+      if (!title) {
+        Alert.alert('Please enter a title to start recording.');
+        return;
+      }
+  
+      try {
+        // Request audio recording permissions
+        const { granted } = await Audio.requestPermissionsAsync();
+        if (!granted) {
+          Alert.alert('Permission to access microphone is required!');
+          return;
+        }
+  
+        // Prepare recording
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+  
+        const { recording } = await Audio.Recording.createAsync(
+          Audio.RecordingOptionsPresets.HIGH_QUALITY
+        );
+  
+        setRecording(recording);
+        setIsRecording(true);
+        setTime(0);
+        intervalRef.current = setInterval(() => setTime((prev) => prev + 1), 1000);
+      } catch (err) {
+        console.error('Failed to start recording:', err);
+        Alert.alert('Error starting recording:', err.message);
+      }
     };
-
-    try {
-      const jsonData = JSON.stringify(recordingData);
-      await AsyncStorage.setItem(`recording_${Date.now()}`, jsonData);
-      Alert.alert("Recording saved successfully!");
-      setTitle('');
+  
+    // Stop recording function
+    const stopRecording = async () => {
+      if (!recording) return;
+  
+      clearInterval(intervalRef.current);
+      setIsRecording(false);
+      try {
+        await recording.stopAndUnloadAsync();
+        const uri = recording.getURI(); // Get the URI of the recording
+        setRecordedURI(uri);
+        setRecording(null);
+        Alert.alert('Recording stopped successfully!');
+      } catch (err) {
+        console.error('Error stopping recording:', err);
+      }
+    };
+  
+    // Cancel recording function
+    const cancelRecording = () => {
+      if (isRecording) stopRecording();
       setTime(0);
-    } catch (error) {
-      Alert.alert("Failed to save recording.");
-    }
-  };
-
-  // Format time
-  const formatTime = (seconds) => {
-    const hrs = Math.floor(seconds / 3600);
-    const mins = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
-    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  return (
-    <View style={styles.recordParent}>
-
-      {/* BACK BUTTON */}
-        <Pressable style ={styles.returnButton} onPress={() => changeView('play')}>
-            <Ionicons name="chevron-back" size={40} color="#fff" />
-        </Pressable>      
-      {/* ENDS */}
-
-      {/* TITLE */}
-            <TextInput 
-            placeholder='Add title' 
-            placeholderTextColor="#B0B0B0" 
-            selectionColor="#000"  
-            maxLength={15} 
-            style={styles.title}
-            value={title}
-            onChangeText={setTitle}
-            >
-            </TextInput>
-      {/* TITLE ENDS*/}
-    
-      {/* VISUALIZATION */}
-
-            <View style = {styles.visualization}>
-                <MaterialCommunityIcons name="waveform" size={90} color="#03FF3E" />
-                <MaterialCommunityIcons name="waveform" size={150} color="#B600FF" />
-                <MaterialCommunityIcons name="waveform" size={90} color="#FF0000" />
-            </View>
-
-      {/* VISUALIZATION ENDS*/}
-
-      {/* BUTTON */}
-            <Pressable style={styles.button}>
-                <MaterialCommunityIcons name="waveform" size={30} color="#B600FF" />
-                <Text style={styles.buttonText}>Audio</Text>
-            </Pressable>
-      {/* ENDS */}
-
-
-      {/* TIME */}
-            <View>
-                <Text style={styles.time}>{formatTime(time)}</Text>
-            </View>
-      {/* ENDS */}
-
-      {/* BOTTOM NAV */}
-            <View style = {styles.navParent}>
-
-                <Pressable style={styles.navChild} onPress={cancelRecording}>
-                    <View style = {styles.navChild}>
-                        <Entypo name="cross" size={30} color="#333" />
-                    </View>
-                </Pressable>
-
-                <Pressable style={styles.navChild} onPress={isRecording ? stopRecording : startRecording}>
-                    <View style = {styles.navSibling}>
-                        <MaterialCommunityIcons name={isRecording ? "pause-circle" : "record-circle"} size={50} color="#FF0000" />
-                    </View>
-                </Pressable>
-
-                <Pressable style={styles.navChild} onPress={saveRecording}>
-                    <View style = {styles.navChild}>
-                        <MaterialIcons name="done" size={30} color="#333" />
-                    </View>
-                </Pressable>
-
-            </View>
-      {/* ENDS */}
-
-
-    </View>
-  );
-}
+      setRecording(null);
+      setRecordedURI(null);
+    };
+  
+    // Save recording function
+    const saveRecording = async () => {
+      if (!recordedURI || !title) {
+        Alert.alert('Please record audio and enter a title before saving.');
+        return;
+      }
+  
+      const recordingData = {
+        title,
+        uri: recordedURI,
+        duration: time,
+        timestamp: new Date().toISOString(),
+      };
+  
+      try {
+        const jsonData = JSON.stringify(recordingData);
+        await AsyncStorage.setItem(`recording_${Date.now()}`, jsonData);
+        Alert.alert('Recording saved successfully!');
+        setTitle('');
+        setTime(0);
+        setRecordedURI(null);
+      } catch (error) {
+        console.error('Error saving recording:', error);
+        Alert.alert('Failed to save recording.');
+      }
+    };
+  
+    // Format time
+    const formatTime = (seconds) => {
+      const hrs = Math.floor(seconds / 3600);
+      const mins = Math.floor((seconds % 3600) / 60);
+      const secs = seconds % 60;
+      return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    };
+  
+    return (
+      <View style={styles.recordParent}>
+        {/* BACK BUTTON */}
+        <Pressable style={styles.returnButton} onPress={() => changeView('play')}>
+          <Ionicons name="chevron-back" size={40} color="#fff" />
+        </Pressable>
+  
+        {/* TITLE */}
+        <TextInput
+          placeholder="Add title"
+          placeholderTextColor="#B0B0B0"
+          selectionColor="#000"
+          maxLength={15}
+          style={styles.title}
+          value={title}
+          onChangeText={setTitle}
+        />
+  
+        {/* VISUALIZATION */}
+        <View style={styles.visualization}>
+          <MaterialCommunityIcons name="waveform" size={90} color="#03FF3E" />
+          <MaterialCommunityIcons name="waveform" size={150} color="#B600FF" />
+          <MaterialCommunityIcons name="waveform" size={90} color="#FF0000" />
+        </View>
+  
+        {/* TIME */}
+        <View>
+          <Text style={styles.time}>{formatTime(time)}</Text>
+        </View>
+  
+        {/* BOTTOM NAV */}
+        <View style={styles.navParent}>
+          <Pressable style={styles.navChild} onPress={cancelRecording}>
+            <Entypo name="cross" size={30} color="#333" />
+          </Pressable>
+  
+          <Pressable style={styles.navSibling} onPress={isRecording ? stopRecording : startRecording}>
+            <MaterialCommunityIcons
+              name={isRecording ? 'pause-circle' : 'record-circle'}
+              size={50}
+              color="#FF0000"
+            />
+          </Pressable>
+  
+          <Pressable style={styles.navChild} onPress={saveRecording}>
+            <MaterialIcons name="done" size={30} color="#333" />
+          </Pressable>
+        </View>
+      </View>
+    );
+  }
 
 const styles = StyleSheet.create({
 

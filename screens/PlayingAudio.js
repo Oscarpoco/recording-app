@@ -25,19 +25,25 @@ export default function Play({ changeView, recordings }) {
   const [sound, setSound] = useState();
 
 
-  // Function to play the recording
-  const playRecording = async (fileUri) => {
+   // Play a recording
+   const playRecording = async (uri) => {
     try {
-      sound = await Audio.Sound.createAsync(
-        { uri: fileUri }
-      );
+      const { sound } = await Audio.Sound.createAsync({ uri });
       setSound(sound);
       await sound.playAsync();
     } catch (error) {
-      console.error('Error playing the recording', error);
-      Alert.alert('Error', 'Failed to play the recording.');
+      console.error('Failed to play recording', error);
     }
   };
+
+  // Unload sound when component unmounts
+  useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
 
   return (
 
@@ -67,7 +73,7 @@ export default function Play({ changeView, recordings }) {
                     </Text>
                     <Pressable style={styles.playButton}>
                         {/* <FontAwesome6 name="trash-alt" size={20} color="#fff" /> */}
-                        <FontAwesome6 name="play" size={20} color="#fff" onPress={() => playRecording(recording.fileUri)}/>
+                        <FontAwesome6 name="play" size={20} color="#fff" onPress={() => playRecording(recording.uri)}/>
                     </Pressable>
                 </View>
                 </Pressable>

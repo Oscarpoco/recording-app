@@ -32,26 +32,32 @@ export default function App() {
 
   // FETCH RECORDINGS
   useEffect(() => {
-
     const loadRecordings = async () => {
       try {
         const keys = await AsyncStorage.getAllKeys();
         const recordingsData = await AsyncStorage.multiGet(keys);
-
-        const recordings = recordingsData.map(([key, value]) => {
-          const recording = JSON.parse(value);
-          return { ...recording, key };
-        });
-
+  
+        // Parse and filter recordings, ensuring `uri` field is included
+        const recordings = recordingsData
+          .map(([key, value]) => {
+            if (key.startsWith('recording_')) { // Ensure it's a recording entry
+              const recording = JSON.parse(value);
+              return { ...recording, key }; // Include the key for unique identification
+            }
+            return null;
+          })
+          .filter(recording => recording !== null); // Remove any non-recording entries
+  
         setRecordings(recordings);
       } catch (error) {
         console.error('Failed to load recordings', error);
         Alert.alert('Error', 'Failed to load recordings.');
       }
     };
-
+  
     loadRecordings();
   }, []);
+  
   // ENDS
 
   // USE EFFECT TO AUTOMATICALLY CHANGE VIEW AFTER 2 SECONDS
