@@ -1,21 +1,22 @@
-import 
-{
-     StyleSheet, 
-     TextInput, 
-     View, 
-     ScrollView, 
-     Pressable, 
-     Text, 
-     Alert,
-
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  ScrollView,
+  Pressable,
+  Text,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 
+
+// SCREEN 
 import MusicPlayer from './ProgressBar';
 
-import React, { useEffect, useState } from 'react';
+// REACT
+import React, { useEffect, useState, useCallback } from 'react';
 
 // STORAGE
-import * as Sharing from 'expo-sharing';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ICONS
@@ -24,61 +25,150 @@ import Octicons from 'react-native-vector-icons/Octicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
-// EXPO
+// EXPO 
+import * as Sharing from 'expo-sharing';
 import { Audio } from 'expo-av';
 
-export default function Play({ changeView, recordings }) {
-  const [sound, setSound] = useState();
+
+
+export default function Play({ changeView, recordings, setRecordings }) {
+
+  // STATES
+  const [sound, setSound] = useState(null);
   const [currentRecording, setCurrentRecording] = useState(null);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  // INIT AUDIO
+  useEffect(() => {
+    const setupAudio = async () => {
+      try {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          playsInSilentModeIOS: true,
+          staysActiveInBackground: true,
+          shouldDuckAndroid: true,
+        });
+      } catch (error) {
+        console.error('Failed to setup audio mode:', error);
+      }
+    };
+    setupAudio();
+  }, []);
+
+  // ENDS
+
+  // CLEANUP 
+  useEffect(() => {
+    return () => {
+      if (sound) {
+        sound.unloadAsync();
+      }
+    };
+  }, [sound]);
+
+  // ENDS
 
 
-   // Play a recording
-   const playRecording = async (uri, key) => {
+  // PLAY RECORDING
+
+  const playRecording = useCallback(async (uri, key, recording) => {
     try {
+      setIsLoading(true);
+
+      // Stop current playback if exists
       if (sound) {
         await sound.stopAsync();
         await sound.unloadAsync();
         setSound(null);
-        setCurrentlyPlaying(null);
       }
-  
-      const { sound: newSound } = await Audio.Sound.createAsync({ uri });
+
+      const { sound: newSound } = await Audio.Sound.createAsync(
+        { uri },
+        { shouldPlay: true },
+        onPlaybackStatusUpdate
+      );
+
       setSound(newSound);
       setCurrentlyPlaying(key);
-  
-      const status = await newSound.getStatusAsync();
-      if (status.isLoaded && status.durationMillis) {
-        await newSound.playAsync();
-  
-        // Use the duration from the sound status
-        setTimeout(() => {
-          setCurrentlyPlaying(null);
-        }, status.durationMillis);
-      } else {
-        throw new Error('Sound is not loaded or duration is unavailable');
+      setCurrentRecording(recording);
+
+    } catch (error) {
+      console.error('Failed to play recording:', error);
+      Alert.alert('Error', 'Failed to play the recording.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const onPlaybackStatusUpdate = useCallback((status) => {
+    if (status.didJustFinish) {
+      setCurrentlyPlaying(null);
+      setCurrentRecording(null);
+    }
+  }, []);
+
+  // END RECORDING
+
+
+  // FAST FORWARD RECORDING
+
+  const fastForward = useCallback(async () => {
+    if (!sound) return;
+
+    try {
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded) {
+        const newPosition = Math.min(
+          status.positionMillis + 10000,
+          status.durationMillis
+        );
+        await sound.setPositionAsync(newPosition);
       }
     } catch (error) {
-      console.error('Failed to play recording', error);
-      Alert.alert('Error', 'Failed to play the recording.');
+      console.error('Fast forward failed:', error);
     }
-  };
-  
+  }, [sound]);
 
-  // Stop the playback
-  const stopPlayback = async () => {
+  // ENDS
+
+
+  // REWIND
+  const rewind = useCallback(async () => {
+    if (!sound) return;
+
+    try {
+      const status = await sound.getStatusAsync();
+      if (status.isLoaded) {
+        const newPosition = Math.max(status.positionMillis - 10000, 0);
+        await sound.setPositionAsync(newPosition);
+      }
+    } catch (error) {
+      console.error('Rewind failed:', error);
+    }
+  }, [sound]);
+
+  // ENDS
+
+
+  // STOP RECORDING
+  const stopPlayback = useCallback(async () => {
     try {
       if (sound) {
         await sound.stopAsync();
         setCurrentlyPlaying(null);
+        setCurrentRecording(null);
       }
     } catch (error) {
-      console.error('Failed to stop playback', error);
+      console.error('Failed to stop playback:', error);
     }
-  };
+  }, [sound]);
+  // ENDS
 
-  // Share recording
-  const shareRecording = async (uri) => {
+
+  // SHARE
+  const shareRecording = useCallback(async (uri) => {
     try {
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(uri);
@@ -86,133 +176,168 @@ export default function Play({ changeView, recordings }) {
         Alert.alert('Error', 'Sharing is not available on this device.');
       }
     } catch (error) {
-      console.error('Failed to share recording', error);
+      console.error('Failed to share recording:', error);
       Alert.alert('Error', 'Failed to share the recording.');
     }
-  };
+  }, []);
+  // ENDS
 
-  // Delete recording
-  const deleteRecording = async (key) => {
+
+  // DELETE
+  const deleteRecording = useCallback(async (key) => {
     try {
       await AsyncStorage.removeItem(key);
-      const updatedRecordings = recordings.filter((recording) => recording.key !== key);
-      setRecordings(updatedRecordings);
+      setRecordings(prev => prev.filter(recording => recording.key !== key));
+      
+      // Stop playback if the deleted recording was playing
+      if (currentRecording?.key === key) {
+        await stopPlayback();
+      }
+      
       Alert.alert('Success', 'Recording deleted successfully.');
     } catch (error) {
-      console.error('Failed to delete recording', error);
+      console.error('Failed to delete recording:', error);
       Alert.alert('Error', 'Failed to delete the recording.');
     }
-  };
+  }, [currentRecording, stopPlayback, setRecordings]);
 
-  // Unload sound when component unmounts
-  useEffect(() => {
-    return sound
-      ? () => {
-          sound.unloadAsync();
-        }
-      : undefined;
-  }, [sound]);
+  // ENDS
+
+
+  // FILTER FOR SEARCH
+
+  const filteredRecordings = recordings.filter(recording =>
+    recording.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // ENDS
 
   return (
     <View style={styles.allRecordingsParent}>
-      {/* TOP NAVIGATION */}
 
-      <View padding= '4'>
-        <View style={styles.searchParent}>
-          <Octicons name="search" size={25} color="#fff" />
-          <TextInput
-            placeholder="Search your recordings"
-            placeholderTextColor="#fff"
-            selectionColor="#333"
-            style={styles.searchInput}
-          />
+      <View style={styles.headerContent}>
+        <View style={styles.searchContainer}>
+          <View style={styles.searchParent}>
+            <Octicons name="search" size={25} color="#fff" />
+            <TextInput
+              placeholder="Search your recordings"
+              placeholderTextColor="#fff"
+              selectionColor="#333"
+              style={styles.searchInput}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+        </View>
+
+        <View style={styles.myRecordings}>
+          <ScrollView style={styles.list}>
+            {filteredRecordings.map((recording) => (
+              <Pressable 
+                key={recording.key}
+                onPress={() =>
+                  currentlyPlaying === recording.key
+                    ? stopPlayback()
+                    : playRecording(recording.uri, recording.key, recording)
+                }
+              >
+                <View style={styles.recordingItem}>
+                  <Text style={styles.recordingText} numberOfLines={1}>
+                    {recording.title || 'Untitled'}
+                  </Text>
+                  <Text style={styles.recordingDuration}>
+                    {new Date(recording.duration * 1000).toISOString().substr(11, 8)}
+                  </Text>
+                  <View style={styles.playButton}>
+                    {isLoading && currentlyPlaying === recording.key ? (
+                      <ActivityIndicator color="white" />
+                    ) : (
+                      <FontAwesome6
+                        name={currentlyPlaying === recording.key ? 'stop' : 'play'} // refer from this code
+                        size={25}
+                        color={currentlyPlaying === recording.key ? 'red' : 'white'}
+                      />
+                    )}
+                  </View>
+                </View>
+              </Pressable>
+            ))}
+          </ScrollView>
         </View>
       </View>
-      {/* TOP NAVIGATION ENDS */}
 
-      {/* ALL RECORDINGS */}
-      <View style={styles.myRecordings}>
-        <ScrollView style={styles.list}>
-          {recordings.map((recording) => (
-            <Pressable key={recording.key}>
-              <View style={styles.recordingItem}>
-                <Text style={styles.recordingText}>{recording.title || 'Untitled'}</Text>
-                <Text style={styles.recordingDuration}>
-                  {new Date(recording.duration * 1000).toISOString().substr(11, 8)}
-                </Text>
-                <Pressable
-                  style={styles.playButton}
-                  onPress={() =>
-                    currentlyPlaying === recording.key
-                      ? stopPlayback()
-                      : playRecording(recording.uri, recording.key)
-                  }
-                >
-                  <FontAwesome6
-                    name={currentlyPlaying === recording.key ? 'stop' : 'play'}
-                    size={25}
-                    color={currentlyPlaying === recording.key ? 'red' : 'white'}
-                  />
-                </Pressable>
-              </View>
-            </Pressable>
-          ))}
-        </ScrollView>
-      </View>
-      {/* ALL RECORDINGS ENDS */}
-
-      {/* NAVIGATION */}
-      {currentRecording === null ? (
-        <View style = {styles.playbackParent}>
-          <View style = {styles.playbackChild}>
-            {/* PROGRESS BAR, PLAYBACK FUNCTIONS */}
+      {currentRecording ? (
+        <View style={styles.playbackParent}>
+          <View style={styles.playbackChild}>
             <View style={styles.playBackFunctions}>
               <View style={styles.progressTitle}>
-                <Text style={styles.progressDurationTitle}>Benny Mayengani</Text>
+                <Text style={styles.progressDurationTitle} numberOfLines={1}>
+                  {currentRecording.title}
+                </Text>
               </View>
               <View style={styles.progressBar}>
-                <MusicPlayer/>
-              </View>
-              <View style={styles.progressDuration}>
-                <Text style={styles.progressDurationText}>00:00</Text>
-                <Text style={styles.progressDurationText}>05:45</Text>
+                <MusicPlayer
+                  duration={currentRecording.duration}
+                  isPlaying={currentlyPlaying === currentRecording.key}
+                  sound={sound}
+                />
               </View>
             </View>
-            {/* ENDS */}
 
-            {/* SHARE , DELETE */}
             <View style={styles.actionsButtons}>
-              <Pressable onPress={() => changeView('record')}>
-                  <MaterialCommunityIcons name="delete" size={30} color="#FFF" />
+              <Pressable 
+                onPress={() => deleteRecording(currentRecording.key)}
+                
+              >
+                <MaterialCommunityIcons name="delete" size={30} color="#FFF" />
               </Pressable>
-              <Pressable onPress={() => changeView('record')}>
-                  <Entypo name="ccw" size={35} color="#FFF" />
+
+              <Pressable onPress={rewind}>
+                <Entypo name="ccw" size={35} color="#FFF" />
               </Pressable>
-              <Pressable onPress={() => changeView('record')}>
-                  <MaterialCommunityIcons name="record-circle" size={60} color="#FF0000" />
+
+              <Pressable 
+                onPress={() => 
+                  currentlyPlaying === currentRecording.key
+                    ? stopPlayback()
+                    : playRecording(currentRecording.uri, currentRecording.key, currentRecording)
+                }
+                style={styles.recordButton}
+              >
+                <FontAwesome6 
+                  name={currentlyPlaying === currentRecording.key ? 'stop' : 'play'}
+                  size={60}
+                  color={currentlyPlaying === currentRecording.key ? 'red' : '#fff'}
+                />
               </Pressable>
-              <Pressable onPress={() => changeView('record')}>
-                  <Entypo name="cw" size={35} color="#FFF" />
+            
+
+              <Pressable onPress={fastForward} >
+                <Entypo name="cw" size={35} color="#FFF" />
               </Pressable>
-              <Pressable onPress={() => changeView('record')}>
-                  <Octicons name="share-android" size={25} color="#FFF" />
+
+              <Pressable 
+                onPress={() => shareRecording(currentRecording.uri)}
+              
+              >
+                <Octicons name="share-android" size={25} color="#FFF" />
               </Pressable>
             </View>
-            {/* ENDS */}
           </View>
         </View>
       ) : (
-        // RECORD BUTTON
-        <Pressable onPress={() => changeView('record')}>
-          <View style={styles.navSibling}>
-            <MaterialCommunityIcons name="record-circle" size={45} color="#FF0000" />
-          </View>
+        <Pressable 
+          onPress={() => changeView('record')}
+          style={styles.navSibling}
+        >
+          <MaterialCommunityIcons 
+            name="record-circle" 
+            size={45} 
+            color="#FF0000" 
+          />
         </Pressable>
       )}
-      {/* RECORD BUTTON ENDS */}
-
     </View>
-
   );
 }
 
@@ -228,6 +353,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     backgroundColor: '#000',
     paddingVertical: 20,
+    position: 'relative'
   },
   // NAV SIBLING
   navSibling: {
@@ -237,13 +363,19 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, .7)',
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 25,
+
   },
 
   playbackParent:
   {
     width: '100%',
-    height: '22%',
+    height: 240,
+    backgroundColor: 'rgba(0, 0, 0, 1)',
     marginTop: 5,
+    position: 'absolute',
+    bottom: 0,
+    zIndex: 1
   },
 
   playbackChild:
@@ -282,7 +414,7 @@ const styles = StyleSheet.create({
   {
     flexDirection: 'row',
     marginBottom: 40,
-    gap: 15,
+    gap: 25,
     alignItems: 'center',
 
   },
@@ -292,6 +424,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     marginBottom: 2,
+  },
+
+  headerContent: 
+  {
+    height: '90%',
+    width: '100%',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    gap: 15,
   },
 
   // SEARCH
@@ -318,7 +460,7 @@ const styles = StyleSheet.create({
 //   RECORDING LIST
   myRecordings: 
   {
-    height: '70%',
+    height: '90%',
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -326,8 +468,9 @@ const styles = StyleSheet.create({
     gap: 10,
     borderWidth: 1.5,
     borderBottomColor: 'rgba(255, 255, 255, .3)',
-    paddingHorizontal: 10,
+    paddingHorizontal: 7,
   },
+
   recordingItem: 
   {
     backgroundColor: '#444',
@@ -336,7 +479,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 10,
     marginBottom: 11,
-    position: 'relative'
+    position: 'relative',
   },
   recordingText: 
   {

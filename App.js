@@ -239,6 +239,7 @@ export default function App() {
           <Play 
             changeView={changeView} 
             recordings={recordings}
+            setRecordings={setRecordings}
           />
         )}
 
