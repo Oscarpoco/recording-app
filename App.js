@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native';
 // CUSTOM SCREENS
 
 import Record from './screens/RecordScreen';
-import Recordings from './screens/recordingsScreen';
 import Splash from './screens/splashScreen';
 import Play from './screens/PlayingAudio';
 
@@ -27,7 +26,6 @@ export default function App() {
 
   const [recordings, setRecordings] = useState([]);
   const [view, setView] = useState('splash');
-  const [selectedAudio, setSelectedAudio] = useState(null);
   const opacity = useRef(new Animated.Value(1)).current;
 
   // RECORDING STATE
@@ -171,7 +169,7 @@ export default function App() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setView('play'); 
-    }, 2000);
+    }, 2500);
 
     return () => clearTimeout(timer); 
   }, []);
@@ -227,13 +225,6 @@ export default function App() {
             formatTime={formatTime}
 
           />
-
-
-        ) : view === 'recording' ? (
-          <Recordings 
-            changeView={changeView} 
-          />
-
 
         ) : (
           <Play 
