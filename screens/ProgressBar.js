@@ -39,12 +39,13 @@ const styles = StyleSheet.create({
   progressBarContainer: {
     width: 330,
     height: 10,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: '#333',
     borderRadius: 5,
   },
+  
   progressBar: {
     height: '100%',
-    backgroundColor: '#007AFF',
+    backgroundColor: '#FFF',
     borderRadius: 5,
   },
 });

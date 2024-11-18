@@ -7,15 +7,21 @@ import
      Pressable, 
      Text, 
      Alert,
-     Keyboard, 
-     KeyboardAvoidingView 
 
 } from 'react-native';
+
+import MusicPlayer from './ProgressBar';
+
 import React, { useEffect, useState } from 'react';
+
+// STORAGE
+import * as Sharing from 'expo-sharing';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ICONS
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
+import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 
 // EXPO
@@ -23,6 +29,7 @@ import { Audio } from 'expo-av';
 
 export default function Play({ changeView, recordings }) {
   const [sound, setSound] = useState();
+  const [currentRecording, setCurrentRecording] = useState(null);
   const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
 
 
@@ -35,16 +42,28 @@ export default function Play({ changeView, recordings }) {
         setSound(null);
         setCurrentlyPlaying(null);
       }
-
+  
       const { sound: newSound } = await Audio.Sound.createAsync({ uri });
       setSound(newSound);
       setCurrentlyPlaying(key);
-      await newSound.playAsync();
+  
+      const status = await newSound.getStatusAsync();
+      if (status.isLoaded && status.durationMillis) {
+        await newSound.playAsync();
+  
+        // Use the duration from the sound status
+        setTimeout(() => {
+          setCurrentlyPlaying(null);
+        }, status.durationMillis);
+      } else {
+        throw new Error('Sound is not loaded or duration is unavailable');
+      }
     } catch (error) {
       console.error('Failed to play recording', error);
       Alert.alert('Error', 'Failed to play the recording.');
     }
   };
+  
 
   // Stop the playback
   const stopPlayback = async () => {
@@ -55,6 +74,33 @@ export default function Play({ changeView, recordings }) {
       }
     } catch (error) {
       console.error('Failed to stop playback', error);
+    }
+  };
+
+  // Share recording
+  const shareRecording = async (uri) => {
+    try {
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(uri);
+      } else {
+        Alert.alert('Error', 'Sharing is not available on this device.');
+      }
+    } catch (error) {
+      console.error('Failed to share recording', error);
+      Alert.alert('Error', 'Failed to share the recording.');
+    }
+  };
+
+  // Delete recording
+  const deleteRecording = async (key) => {
+    try {
+      await AsyncStorage.removeItem(key);
+      const updatedRecordings = recordings.filter((recording) => recording.key !== key);
+      setRecordings(updatedRecordings);
+      Alert.alert('Success', 'Recording deleted successfully.');
+    } catch (error) {
+      console.error('Failed to delete recording', error);
+      Alert.alert('Error', 'Failed to delete the recording.');
     }
   };
 
@@ -70,14 +116,17 @@ export default function Play({ changeView, recordings }) {
   return (
     <View style={styles.allRecordingsParent}>
       {/* TOP NAVIGATION */}
-      <View style={styles.searchParent}>
-        <Octicons name="search" size={25} color="#fff" />
-        <TextInput
-          placeholder="Search your recordings"
-          placeholderTextColor="#fff"
-          selectionColor="#333"
-          style={styles.searchInput}
-        />
+
+      <View padding= '4'>
+        <View style={styles.searchParent}>
+          <Octicons name="search" size={25} color="#fff" />
+          <TextInput
+            placeholder="Search your recordings"
+            placeholderTextColor="#fff"
+            selectionColor="#333"
+            style={styles.searchInput}
+          />
+        </View>
       </View>
       {/* TOP NAVIGATION ENDS */}
 
@@ -101,8 +150,8 @@ export default function Play({ changeView, recordings }) {
                 >
                   <FontAwesome6
                     name={currentlyPlaying === recording.key ? 'stop' : 'play'}
-                    size={20}
-                    color="#fff"
+                    size={25}
+                    color={currentlyPlaying === recording.key ? 'red' : 'white'}
                   />
                 </Pressable>
               </View>
@@ -112,14 +161,58 @@ export default function Play({ changeView, recordings }) {
       </View>
       {/* ALL RECORDINGS ENDS */}
 
-      {/* RECORD BUTTON */}
-      <Pressable onPress={() => changeView('record')}>
-        <View style={styles.navSibling}>
-          <MaterialCommunityIcons name="record-circle" size={50} color="#FF0000" />
+      {/* NAVIGATION */}
+      {currentRecording === null ? (
+        <View style = {styles.playbackParent}>
+          <View style = {styles.playbackChild}>
+            {/* PROGRESS BAR, PLAYBACK FUNCTIONS */}
+            <View style={styles.playBackFunctions}>
+              <View style={styles.progressTitle}>
+                <Text style={styles.progressDurationTitle}>Benny Mayengani</Text>
+              </View>
+              <View style={styles.progressBar}>
+                <MusicPlayer/>
+              </View>
+              <View style={styles.progressDuration}>
+                <Text style={styles.progressDurationText}>00:00</Text>
+                <Text style={styles.progressDurationText}>05:45</Text>
+              </View>
+            </View>
+            {/* ENDS */}
+
+            {/* SHARE , DELETE */}
+            <View style={styles.actionsButtons}>
+              <Pressable onPress={() => changeView('record')}>
+                  <MaterialCommunityIcons name="delete" size={30} color="#FFF" />
+              </Pressable>
+              <Pressable onPress={() => changeView('record')}>
+                  <Entypo name="ccw" size={35} color="#FFF" />
+              </Pressable>
+              <Pressable onPress={() => changeView('record')}>
+                  <MaterialCommunityIcons name="record-circle" size={60} color="#FF0000" />
+              </Pressable>
+              <Pressable onPress={() => changeView('record')}>
+                  <Entypo name="cw" size={35} color="#FFF" />
+              </Pressable>
+              <Pressable onPress={() => changeView('record')}>
+                  <Octicons name="share-android" size={25} color="#FFF" />
+              </Pressable>
+            </View>
+            {/* ENDS */}
+          </View>
         </View>
-      </Pressable>
+      ) : (
+        // RECORD BUTTON
+        <Pressable onPress={() => changeView('record')}>
+          <View style={styles.navSibling}>
+            <MaterialCommunityIcons name="record-circle" size={45} color="#FF0000" />
+          </View>
+        </Pressable>
+      )}
       {/* RECORD BUTTON ENDS */}
+
     </View>
+
   );
 }
 
@@ -135,17 +228,72 @@ const styles = StyleSheet.create({
     position: 'relative',
     backgroundColor: '#000',
     paddingVertical: 20,
-    paddingHorizontal: 10,
   },
   // NAV SIBLING
   navSibling: {
     width: 60,
     height: 60,
     borderRadius: 50,
-    backgroundColor: '#079AE9',
+    backgroundColor: 'rgba(255, 255, 255, .7)',
     justifyContent: 'center',
     alignItems: 'center',
   },
+
+  playbackParent:
+  {
+    width: '100%',
+    height: '22%',
+    marginTop: 5,
+  },
+
+  playbackChild:
+  {
+    backgroundColor: 'rgba(255, 255, 255, .3)',
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
+    paddingVertical: 15,
+    alignItems: 'center',
+  },
+
+  progressDuration:
+  {
+    width: 330,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  
+  progressDurationText:
+  {
+    fontWeight: 900,
+    color: '#fff',
+  },
+
+  progressDurationTitle:
+  {
+    fontWeight: 900,
+    color: '#fff',
+    fontSize: 18,
+    letterSpacing: 1
+  },
+
+  actionsButtons:
+  {
+    flexDirection: 'row',
+    marginBottom: 40,
+    gap: 15,
+    alignItems: 'center',
+
+  },
+
+  progressTitle:
+  {
+    alignItems: 'center',
+    paddingVertical: 10,
+    marginBottom: 2,
+  },
+
   // SEARCH
   searchParent: {
     width: '100%',
@@ -159,7 +307,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     gap: 10,
   },
-  searchInput: {
+  searchInput: 
+  {
     fontSize: 16,
     width: '85%',
     height: 40,
@@ -167,22 +316,26 @@ const styles = StyleSheet.create({
   },
 
 //   RECORDING LIST
-  myRecordings: {
-    height: '80%',
+  myRecordings: 
+  {
+    height: '70%',
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
     gap: 10,
-    borderRadius: 10,
+    borderWidth: 1.5,
+    borderBottomColor: 'rgba(255, 255, 255, .3)',
+    paddingHorizontal: 10,
   },
   recordingItem: 
   {
     backgroundColor: '#444',
     padding: 10,
+    paddingVertical: 11,
     width: '100%',
     borderRadius: 10,
-    marginBottom: 10,
+    marginBottom: 11,
     position: 'relative'
   },
   recordingText: 

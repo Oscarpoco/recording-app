@@ -1,5 +1,5 @@
 
-import { StyleSheet, Text, View, Pressable, TextInput, Alert } from 'react-native';
+import { StyleSheet, Text, View, Pressable, TextInput } from 'react-native';
 
 // REACT 
 import { useState, useRef  } from 'react';
@@ -14,127 +14,28 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export default function Record({changeView}) {
-    // STATE
-    const [title, setTitle] = useState('');
-    const [isRecording, setIsRecording] = useState(false);
-    const [time, setTime] = useState(0);
-    const intervalRef = useRef(null);
-    const [recording, setRecording] = useState(null); // Current recording instance
-    const [recordedURI, setRecordedURI] = useState(null); // URI of the saved recording
-  
-    // Start recording function
-    const startRecording = async () => {
-      if (!title) {
-        Alert.alert('Please enter a title to start recording.');
-        return;
-      }
-  
-      try {
-        // Request audio recording permissions
-        const { granted } = await Audio.requestPermissionsAsync();
-        if (!granted) {
-          Alert.alert('Permission to access microphone is required!');
-          return;
-        }
-  
-        // Prepare recording
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-  
-        const { recording } = await Audio.Recording.createAsync(
-          Audio.RecordingOptionsPresets.HIGH_QUALITY
-        );
-  
-        setRecording(recording);
-        setIsRecording(true);
-        setTime(0);
-        intervalRef.current = setInterval(() => setTime((prev) => prev + 1), 1000);
-      } catch (err) {
-        console.error('Failed to start recording:', err);
-        Alert.alert('Error starting recording:', err.message);
-      }
-    };
-  
-    // Stop recording function
-    const stopRecording = async () => {
-      if (!recording) return;
-  
-      clearInterval(intervalRef.current);
-      setIsRecording(false);
-      try {
-        await recording.stopAndUnloadAsync();
-        const uri = recording.getURI(); // Get the URI of the recording
-        setRecordedURI(uri);
-        setRecording(null);
-        Alert.alert('Recording stopped successfully!');
-      } catch (err) {
-        console.error('Error stopping recording:', err);
-      }
-    };
-  
-    // Cancel recording function
-    const cancelRecording = () => {
-      if (isRecording) stopRecording();
-      setTime(0);
-      setRecording(null);
-      setRecordedURI(null);
-    };
-  
-    // Save recording function
-    const saveRecording = async () => {
-      if (!recordedURI || !title) {
-        Alert.alert('Please record audio and enter a title before saving.');
-        return;
-      }
-  
-      const recordingData = {
-        title,
-        uri: recordedURI,
-        duration: time,
-        timestamp: new Date().toISOString(),
-      };
-  
-      try {
-        const jsonData = JSON.stringify(recordingData);
-        await AsyncStorage.setItem(`recording_${Date.now()}`, jsonData);
-        Alert.alert('Recording saved successfully!');
-        setTitle('');
-        setTime(0);
-        setRecordedURI(null);
-      } catch (error) {
-        console.error('Error saving recording:', error);
-        Alert.alert('Failed to save recording.');
-      }
-    };
-  
-    // Format time
-    const formatTime = (seconds) => {
-      const hrs = Math.floor(seconds / 3600);
-      const mins = Math.floor((seconds % 3600) / 60);
-      const secs = seconds % 60;
-      return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    };
+export default function Record({changeView, title, setTitle, saveRecording, isRecording, stopRecording, startRecording, cancelRecording, formatTime, time}) {
   
     return (
       <View style={styles.recordParent}>
-        {/* BACK BUTTON */}
-        <Pressable style={styles.returnButton} onPress={() => changeView('play')}>
-          <Ionicons name="chevron-back" size={40} color="#fff" />
-        </Pressable>
-  
-        {/* TITLE */}
-        <TextInput
-          placeholder="Add title"
-          placeholderTextColor="#B0B0B0"
-          selectionColor="#000"
-          maxLength={15}
-          style={styles.title}
-          value={title}
-          onChangeText={setTitle}
-        />
+
+        <View style ={styles.returnButtonParent}>
+          {/* BACK BUTTON */}
+          <Pressable style={styles.returnButton} onPress={() => changeView('play')}>
+            <Ionicons name="chevron-back" size={30} color="#fff" />
+          </Pressable>
+    
+          {/* TITLE */}
+          <TextInput
+            placeholder="Add title"
+            placeholderTextColor="#B0B0B0"
+            selectionColor="#000"
+            maxLength={15}
+            style={styles.title}
+            value={title}
+            onChangeText={setTitle}
+          />
+        </View>
   
         {/* VISUALIZATION */}
         <View style={styles.visualization}>
@@ -199,7 +100,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         gap: 30,
-        elevation: 5
+        elevation: 5,
+        marginBottom: 40,
     },
     // ENDS
 
@@ -207,16 +109,16 @@ const styles = StyleSheet.create({
     {
         width: 50 , height: 50,
         borderRadius: 50,
-        backgroundColor: '#079AE9',
+        backgroundColor: 'rgba(255, 255, 255, .7)',
         justifyContent: 'center',
         alignItems: 'center',
     },
 
     navSibling:
     {
-        width: 80 , height: 80,
+        width: 70 , height: 70,
         borderRadius: 50,
-        backgroundColor: '#079AE9',
+        backgroundColor: 'rgba(255, 255, 255, .7)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -259,27 +161,32 @@ const styles = StyleSheet.create({
         gap: 1
     },
 
+    returnButtonParent:
+    {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      marginTop: 30,
+      gap: 30
+    },
+
     title:
     {
         color: '#fff',
-        fontSize: 30,
+        fontSize: 18,
         fontWeight: 'bold',
         letterSpacing: 5,
-        marginBottom: 50,
-        borderWidth: 2,
-        borderColor: '#333',
         borderRadius: 10,
-        paddingHorizontal: 80
+        paddingHorizontal: 50
     },
     // ENDS
 
     returnButton:
     {
-        width: '100%',
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        marginTop: 40,
     }
 
 });
