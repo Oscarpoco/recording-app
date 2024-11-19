@@ -22,7 +22,7 @@ export default function Record({changeView, title, setTitle, saveRecording, isRe
         <View style ={styles.returnButtonParent}>
           {/* BACK BUTTON */}
           <Pressable style={styles.returnButton} onPress={() => changeView('play')}>
-            <MaterialCommunityIcons name="keyboard-backspace" size={35} color="#fff" />
+            <MaterialCommunityIcons name="keyboard-backspace" size={40} color="#fff" />
           </Pressable>
     
           {/* TITLE */}
