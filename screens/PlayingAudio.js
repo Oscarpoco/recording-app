@@ -371,7 +371,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
         <View style={styles.settingsParent}>
             <View style={styles.returnButtonIcon}>
               <Pressable onPress={() =>setSettings(false)}>
-                <Ionicons name="arrow-back" size={35} color="#fff" />
+                <MaterialCommunityIcons name="keyboard-backspace" size={35} color="#fff" />
               </Pressable>
             </View>
 

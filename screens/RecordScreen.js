@@ -22,7 +22,7 @@ export default function Record({changeView, title, setTitle, saveRecording, isRe
         <View style ={styles.returnButtonParent}>
           {/* BACK BUTTON */}
           <Pressable style={styles.returnButton} onPress={() => changeView('play')}>
-            <Ionicons name="arrow-back" size={35} color="#fff" />
+            <MaterialCommunityIcons name="keyboard-backspace" size={35} color="#fff" />
           </Pressable>
     
           {/* TITLE */}
@@ -38,34 +38,42 @@ export default function Record({changeView, title, setTitle, saveRecording, isRe
         </View>
   
         {/* VISUALIZATION */}
-        <View style={styles.visualization}>
-          <MaterialCommunityIcons name="waveform" size={90} color="#03FF3E" />
-          <MaterialCommunityIcons name="waveform" size={150} color="#B600FF" />
-          <MaterialCommunityIcons name="waveform" size={90} color="#FF0000" />
-        </View>
-  
-        {/* TIME */}
-        <View>
-          <Text style={styles.time}>{formatTime(time)}</Text>
-        </View>
-  
-        {/* BOTTOM NAV */}
-        <View style={styles.navParent}>
-          <Pressable style={styles.navChild} onPress={cancelRecording}>
-            <Entypo name="cross" size={30} color="#333" />
-          </Pressable>
-  
-          <Pressable style={styles.navSibling} onPress={isRecording ? stopRecording : startRecording}>
-            <MaterialCommunityIcons
-              name={isRecording ? 'pause-circle' : 'record-circle'}
-              size={50}
-              color="#FF0000"
-            />
-          </Pressable>
-  
-          <Pressable style={styles.navChild} onPress={saveRecording}>
-            <MaterialIcons name="done" size={30} color="#333" />
-          </Pressable>
+
+        <View style={styles.contentParent}>
+
+          <View style={styles.content}>
+                <Text style={styles.settingsHeader}>Recoder</Text>
+          </View>
+
+          <View style={styles.visualization}>
+            <MaterialCommunityIcons name="waveform" size={100} color="rgba(0, 0, 0, .5)" />
+            <MaterialCommunityIcons name="waveform" size={170} color="rgba(0, 0, 0, .8)" />
+            <MaterialCommunityIcons name="waveform" size={100} color="rgba(0, 0, 0, .5)" />
+          </View>
+    
+          {/* TIME */}
+          <View>
+            <Text style={styles.time}>{formatTime(time)}</Text>
+          </View>
+    
+          {/* BOTTOM NAV */}
+          <View style={styles.navParent}>
+            <Pressable style={styles.navChild} onPress={cancelRecording}>
+              <Entypo name="cross" size={30} color="#333" />
+            </Pressable>
+    
+            <Pressable style={styles.navSibling} onPress={isRecording ? stopRecording : startRecording}>
+              <MaterialCommunityIcons
+                name={isRecording ? 'pause-circle' : 'record-circle'}
+                size={50}
+                color="#FF0000"
+              />
+            </Pressable>
+    
+            <Pressable style={styles.navChild} onPress={saveRecording}>
+              <MaterialIcons name="done" size={30} color="#333" />
+            </Pressable>
+          </View>
         </View>
       </View>
     );
@@ -83,9 +91,6 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         flexDirection: 'column',
         backgroundColor: '#000',
-        paddingVertical: 10,
-        paddingHorizontal: 10,
-        gap: 30
     },
     // ENDS
 
@@ -100,7 +105,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'row',
         gap: 30,
-        elevation: 5,
         marginBottom: 40,
     },
     // ENDS
@@ -109,7 +113,7 @@ const styles = StyleSheet.create({
     {
         width: 50 , height: 50,
         borderRadius: 50,
-        backgroundColor: 'rgba(255, 255, 255, .7)',
+        backgroundColor: 'rgba(0, 0, 0, .3)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -118,7 +122,7 @@ const styles = StyleSheet.create({
     {
         width: 70 , height: 70,
         borderRadius: 50,
-        backgroundColor: 'rgba(255, 255, 255, .7)',
+        backgroundColor: 'rgba(0, 0, 0, .3)',
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -129,7 +133,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 5,
         marginBottom: 30,
-        color: '#fff'
+        color: 'rgba(0, 0, 0, .7)',
     },
 
     button:
@@ -153,12 +157,25 @@ const styles = StyleSheet.create({
 
     },
 
+    contentParent:
+    {
+      height: '80%',
+      width: '100%',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255, 255, 255, .6)',
+      borderRadius: 40,
+      position: 'relative'
+
+    },
+
     visualization:
     {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 1
+        gap: 0
     },
 
     returnButtonParent:
@@ -168,7 +185,9 @@ const styles = StyleSheet.create({
       justifyContent: 'flex-start',
       alignItems: 'center',
       marginTop: 30,
-      gap: 30
+      gap: 30,
+      paddingVertical: 10,
+      paddingHorizontal: 10,
     },
 
     title:
@@ -177,8 +196,10 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         letterSpacing: 5,
-        borderRadius: 10,
-        paddingHorizontal: 50
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderColor: 'rgba(255, 255, 255, .6)',
+        width: '80%'
     },
     // ENDS
 
@@ -187,6 +208,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-    }
+        marginTop: 10,
+    },
+
+    settingsHeader:
+    {
+      fontSize: 28,
+      fontWeight: 900,
+      letterSpacing: 2,
+    },
+
+    content:
+    {
+      position: 'absolute',
+      top: 20
+    },
 
 });
