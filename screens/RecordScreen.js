@@ -22,7 +22,7 @@ export default function Record({changeView, title, setTitle, saveRecording, isRe
         <View style ={styles.returnButtonParent}>
           {/* BACK BUTTON */}
           <Pressable style={styles.returnButton} onPress={() => changeView('play')}>
-            <Ionicons name="chevron-back" size={30} color="#fff" />
+            <Ionicons name="arrow-back" size={35} color="#fff" />
           </Pressable>
     
           {/* TITLE */}

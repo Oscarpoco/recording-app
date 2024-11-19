@@ -22,6 +22,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // ICONS
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -41,7 +42,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
   const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [settings, setSettings] = useState(true);
+  const [settings, setSettings] = useState(false);
 
   // FORM
   const [input1, setInput1] = useState('');
@@ -339,7 +340,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
 
         <View style={styles.recordButtonParent}>
           <Pressable 
-            onPress={() => changeView('record')}
+            onPress={() => setSettings(true)}
             style={styles.navSettings}
           >
             <MaterialIcons 
@@ -368,6 +369,12 @@ export default function Play({ changeView, recordings, setRecordings }) {
     
       (
         <View style={styles.settingsParent}>
+            <View style={styles.returnButtonIcon}>
+              <Pressable onPress={() =>setSettings(false)}>
+                <Ionicons name="arrow-back" size={35} color="#fff" />
+              </Pressable>
+            </View>
+
             <View style={styles.settingsChild}>
 
               <View>
@@ -506,14 +513,14 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 1)',
     alignItems: 'center',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     zIndex: 1
   },
 
   settingsChild:
   {
     width: '100%',
-    height: '85%',
+    height: '90%',
     backgroundColor: 'rgba(255, 255, 255, .8)',
     borderRadius: 40,
     alignItems: 'center',
@@ -757,13 +764,26 @@ const styles = StyleSheet.create({
     fontWeight: 900,
     marginTop: 10,
     color: 'rgba(0, 0, 0, .5)',
+    fontSize: 12
   },
 
   versionText:
   {
     fontWeight: 900,
     color: 'rgba(0, 0, 0, .5)',
-    textAlign: 'center'
-  }
+    textAlign: 'center',
+
+  },
+
+  returnButtonIcon:
+  {
+    fontWeight: 900,
+    color: 'rgba(0, 0, 0, .5)',
+    marginTop: 20,
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    paddingHorizontal: 10,
+    width: '100%'
+  },
 
 });
