@@ -24,10 +24,12 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Octicons from 'react-native-vector-icons/Octicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 // EXPO 
 import * as Sharing from 'expo-sharing';
 import { Audio } from 'expo-av';
+import { format } from 'date-fns';
 
 
 
@@ -39,6 +41,13 @@ export default function Play({ changeView, recordings, setRecordings }) {
   const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [settings, setSettings] = useState(true);
+
+  // FORM
+  const [input1, setInput1] = useState('');
+  const [input2, setInput2] = useState('');
+  const [input3, setInput3] = useState('');
+ 
 
   // INIT AUDIO
   useEffect(() => {
@@ -121,7 +130,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
       const status = await sound.getStatusAsync();
       if (status.isLoaded) {
         const newPosition = Math.min(
-          status.positionMillis + 10000,
+          status.positionMillis + 2000,
           status.durationMillis
         );
         await sound.setPositionAsync(newPosition);
@@ -141,7 +150,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
     try {
       const status = await sound.getStatusAsync();
       if (status.isLoaded) {
-        const newPosition = Math.max(status.positionMillis - 10000, 0);
+        const newPosition = Math.max(status.positionMillis - 2000, 0);
         await sound.setPositionAsync(newPosition);
       }
     } catch (error) {
@@ -212,16 +221,21 @@ export default function Play({ changeView, recordings, setRecordings }) {
 
   // ENDS
 
+  // FORM SUBMISSION
+  const handleSubmit = () => {
+    Alert.alert('Form Submitted', `Input 1: ${input1}, Input 2: ${input2}, Input 3: ${input3}`);
+  };
+
   return (
     <View style={styles.allRecordingsParent}>
 
       <View style={styles.headerContent}>
         <View style={styles.searchContainer}>
           <View style={styles.searchParent}>
-            <Octicons name="search" size={25} color="#fff" />
+            <Octicons name="search" size={25} color="rgba(255, 255, 255, .5)" />
             <TextInput
               placeholder="Search your recordings"
-              placeholderTextColor="#fff"
+              placeholderTextColor="rgba(255, 255, 255, .5)"
               selectionColor="#333"
               style={styles.searchInput}
               value={searchQuery}
@@ -243,7 +257,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
               >
                 <View style={styles.recordingItem}>
                   <Text style={styles.recordingText} numberOfLines={1}>
-                    {recording.title || 'Untitled'}
+                    {recording.title || 'Untitled'} - {format(new Date(recording.timestamp), 'PPPpp')}
                   </Text>
                   <Text style={styles.recordingDuration}>
                     {new Date(recording.duration * 1000).toISOString().substr(11, 8)}
@@ -252,11 +266,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
                     {isLoading && currentlyPlaying === recording.key ? (
                       <ActivityIndicator color="white" />
                     ) : (
-                      <FontAwesome6
-                        name={currentlyPlaying === recording.key ? 'stop' : 'play'} // refer from this code
-                        size={25}
-                        color={currentlyPlaying === recording.key ? 'red' : 'white'}
-                      />
+                     <View></View>
                     )}
                   </View>
                 </View>
@@ -289,11 +299,11 @@ export default function Play({ changeView, recordings, setRecordings }) {
                 onPress={() => deleteRecording(currentRecording.key)}
                 
               >
-                <MaterialCommunityIcons name="delete" size={30} color="#FFF" />
+                <MaterialCommunityIcons name="delete" size={25} color="#FFF" />
               </Pressable>
 
               <Pressable onPress={rewind}>
-                <Entypo name="ccw" size={35} color="#FFF" />
+                <Entypo name="ccw" size={30} color="#FFF" />
               </Pressable>
 
               <Pressable 
@@ -306,37 +316,159 @@ export default function Play({ changeView, recordings, setRecordings }) {
               >
                 <FontAwesome6 
                   name={currentlyPlaying === currentRecording.key ? 'stop' : 'play'}
-                  size={60}
+                  size={50}
                   color={currentlyPlaying === currentRecording.key ? 'red' : '#fff'}
                 />
               </Pressable>
             
 
               <Pressable onPress={fastForward} >
-                <Entypo name="cw" size={35} color="#FFF" />
+                <Entypo name="cw" size={30} color="#FFF" />
               </Pressable>
 
               <Pressable 
                 onPress={() => shareRecording(currentRecording.uri)}
               
               >
-                <Octicons name="share-android" size={25} color="#FFF" />
+                <Octicons name="share-android" size={20} color="#FFF" />
               </Pressable>
             </View>
           </View>
         </View>
       ) : (
-        <Pressable 
-          onPress={() => changeView('record')}
-          style={styles.navSibling}
-        >
-          <MaterialCommunityIcons 
-            name="record-circle" 
-            size={45} 
-            color="#FF0000" 
-          />
-        </Pressable>
+
+        <View style={styles.recordButtonParent}>
+          <Pressable 
+            onPress={() => changeView('record')}
+            style={styles.navSettings}
+          >
+            <MaterialIcons 
+              name="settings" 
+              size={40} 
+              color="#FFF" 
+            />
+          </Pressable>
+          
+          <Pressable 
+            onPress={() => changeView('record')}
+            style={styles.navSibling}
+          >
+            <MaterialCommunityIcons 
+              name="record-circle" 
+              size={45} 
+              color="#FF0000" 
+            />
+          </Pressable>
+        </View>
       )}
+
+      {/* SETTINGS */}
+
+    {settings && 
+    
+      (
+        <View style={styles.settingsParent}>
+            <View style={styles.settingsChild}>
+
+              <View>
+                <Text style={styles.settingsHeader}>Feedback</Text>
+              </View>
+
+              {/* FORM */}
+              <View style={styles.formContainer}>
+                {/* Input 1 */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Name</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter your Name"
+                    value={input1}
+                    onChangeText={setInput1}
+                  />
+                </View>
+
+                {/* Input 2 */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Email</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter your Email"
+                    value={input2}
+                    onChangeText={setInput2}
+                  />
+                </View>
+
+                {/* Input 3 */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>Message</Text>
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    placeholder="Enter your Message"
+                    value={input3}
+                    onChangeText={setInput3}
+                    multiline={true}
+                    numberOfLines={4}
+                  />
+                </View>
+
+                {/* Submit Button */}
+                <Pressable style={styles.button} onPress={handleSubmit}>
+                  <Text style={styles.buttonText}>Submit</Text>
+                </Pressable>
+              
+
+                <View style={styles.reachUsParent}>
+
+                    <View style={styles.reachUsChild}>
+                      <Pressable style={styles.circleIcon}>
+                        <Entypo 
+                          name="email" 
+                          size={25} 
+                          color="rgba(255, 255, 255, .7)" 
+                        />
+                      </Pressable>
+
+                      <Text style={styles.reachUsText}>m@support.co.za</Text>
+
+                    </View>
+
+                    <View style={styles.reachUsChild}>
+
+                      <Pressable style={styles.circleIcon}>
+                        <MaterialIcons 
+                          name="phone-android" 
+                          size={25} 
+                          color="rgba(255, 255, 255, .7)" 
+                        />
+                      </Pressable>
+
+                      <Text style={styles.reachUsText}>+27 660 850 741</Text>
+                      
+                    </View>
+
+                    <View style={styles.reachUsChild}>
+                      <Pressable style={styles.circleIcon}>
+                        <MaterialIcons 
+                          name="phone-android" 
+                          size={25} 
+                          color="rgba(255, 255, 255, .7)" 
+                        />
+                      </Pressable>
+                      
+                      <Text style={styles.reachUsText}>+27 810 449 718</Text>
+                      
+                    </View>
+                </View>
+
+                <Text style={styles.versionText}>version 1.0.0</Text>
+
+              </View>
+
+            </View>
+        </View>
+      )
+
+    }
     </View>
   );
 }
@@ -355,6 +487,53 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     position: 'relative'
   },
+
+  recordButtonParent:
+  {
+    flexDirection: 'row',
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%'
+  },
+
+  settingsParent:
+  {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    height: '100%',
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 1)',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    zIndex: 1
+  },
+
+  settingsChild:
+  {
+    width: '100%',
+    height: '85%',
+    backgroundColor: 'rgba(255, 255, 255, .8)',
+    borderRadius: 40,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingVertical: 20,
+  },
+
+  settingsHeader:
+  {
+    fontSize: 24,
+    fontWeight: 900,
+    letterSpacing: 2
+  },
+
+  navSettings:
+  {
+    position: 'absolute',
+    left: 30,
+    bottom: 10,
+  },
   // NAV SIBLING
   navSibling: {
     width: 60,
@@ -364,13 +543,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 25,
-
   },
 
   playbackParent:
   {
     width: '100%',
-    height: 240,
+    height: 160,
     backgroundColor: 'rgba(0, 0, 0, 1)',
     marginTop: 5,
     position: 'absolute',
@@ -384,7 +562,6 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 10,
-    paddingVertical: 15,
     alignItems: 'center',
   },
 
@@ -465,9 +642,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    gap: 10,
     borderWidth: 1.5,
-    borderBottomColor: 'rgba(255, 255, 255, .3)',
+    borderBottomColor: 'rgba(255, 255, 255, .2)',
     paddingHorizontal: 7,
   },
 
@@ -478,19 +654,19 @@ const styles = StyleSheet.create({
     paddingVertical: 11,
     width: '100%',
     borderRadius: 10,
-    marginBottom: 11,
+    marginBottom: 9,
     position: 'relative',
   },
   recordingText: 
   {
     color: '#fff',
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   recordingDuration: 
   {
     color: '#ccc',
-    fontSize: 14,
+    fontSize: 13,
   },
 
   playButton:
@@ -498,6 +674,96 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     top: 20,
+  },
+
+  // FORM
+  formContainer: {
+    paddingVertical: 40,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    height: '100%',
+    width: '100%',
+  },
+
+  inputGroup: {
+    marginBottom: 20,
+  },
+
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 5,
+  },
+  input: {
+    borderBottomWidth: 1,
+    borderColor: 'rgba(0, 0, 0, .3)',
+    padding: 10,
+    fontSize: 16,
+    color: 'rgba(0, 0, 0, .1',
+  },
+
+  button: {
+    backgroundColor: '#007BFF',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+
+  textArea: {
+    height: 100, 
+    textAlignVertical: 'top',
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+
+  reachUsParent:
+  {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    paddingVertical: 20,
+    marginTop: 20
+  },
+
+  circleIcon:
+  {
+    width: 40,
+    height: 40,
+    backgroundColor: 'rgba(0, 0, 0, .1)',
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  reachUsChild: 
+  {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '33.33%',
+    paddingVertical: 10,
+  },
+
+  reachUsText:
+  {
+    fontWeight: 900,
+    marginTop: 10,
+    color: 'rgba(0, 0, 0, .5)',
+  },
+
+  versionText:
+  {
+    fontWeight: 900,
+    color: 'rgba(0, 0, 0, .5)',
+    textAlign: 'center'
   }
 
 });

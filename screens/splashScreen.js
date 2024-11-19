@@ -131,12 +131,6 @@ export default function Splash() {
         />
       </Animated.View>
 
-      {/* SECOND CHILD */}
-      <View style={styles.secondChild}>
-        <View style={styles.secondChildSibling}>
-          <Text style={styles.text}>Recorder</Text>
-        </View>
-      </View>
     </View>
   );
 }
@@ -152,7 +146,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     position: 'relative',
     backgroundColor: '#000',
   },
@@ -188,37 +182,6 @@ const styles = StyleSheet.create({
         fontWeight: 900
     },
 
-    // ENDS
-
-    // SECOND CHILD
-    secondChild: 
-    {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        width: '100%',
-        height: '50%',
-        backgroundColor: 'rgba(255, 255, 255, .3)',
-        borderRadius: 40,
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        zIndex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    // Second child sibling
-    secondChildSibling:
-    {
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
-        gap: 10,
-        backgroundColor: 'rgba(0, 0, 0, .9)',
-        width: '70%',
-        height: '50%',
-        borderRadius: 40,    
-    },
     // ENDS
 
     animatedCircle: 
