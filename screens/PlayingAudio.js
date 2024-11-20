@@ -9,6 +9,8 @@ import {
   ActivityIndicator
 } from 'react-native';
 
+import Toast from 'react-native-toast-message';
+
 
 // SCREEN 
 import MusicPlayer from './ProgressBar';
@@ -22,7 +24,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // ICONS
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Octicons from 'react-native-vector-icons/Octicons';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
@@ -106,7 +107,13 @@ export default function Play({ changeView, recordings, setRecordings }) {
 
     } catch (error) {
       console.error('Failed to play recording:', error);
-      Alert.alert('Error', 'Failed to play the recording.');
+
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to play the recording.',
+      });
+
     } finally {
       setIsLoading(false);
     }
@@ -183,11 +190,22 @@ export default function Play({ changeView, recordings, setRecordings }) {
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(uri);
       } else {
-        Alert.alert('Error', 'Sharing is not available on this device.');
+        
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Sharing is not available on this device.',
+        });
+
       }
     } catch (error) {
       console.error('Failed to share recording:', error);
-      Alert.alert('Error', 'Failed to share the recording.');
+    
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to share the recording.',
+      });
     }
   }, []);
   // ENDS
@@ -204,10 +222,20 @@ export default function Play({ changeView, recordings, setRecordings }) {
         await stopPlayback();
       }
       
-      Alert.alert('Success', 'Recording deleted successfully.');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Recording deleted successfully.',
+      });
+
     } catch (error) {
       console.error('Failed to delete recording:', error);
-      Alert.alert('Error', 'Failed to delete the recording.');
+  
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to delete the recording.',
+      });
     }
   }, [currentRecording, stopPlayback, setRecordings]);
 
@@ -225,6 +253,11 @@ export default function Play({ changeView, recordings, setRecordings }) {
   // FORM SUBMISSION
   const handleSubmit = () => {
     Alert.alert('Form Submitted', `Input 1: ${input1}, Input 2: ${input2}, Input 3: ${input3}`);
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: 'Recording deleted successfully.',
+    });
   };
 
   return (
@@ -546,7 +579,7 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, .7)',
+    backgroundColor: '#444',
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 25,

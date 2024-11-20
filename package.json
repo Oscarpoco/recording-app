@@ -23,6 +23,7 @@
     "react-native": "^0.76.2",
     "react-native-audio-record": "^0.2.2",
     "react-native-progress": "^5.0.1",
+    "react-native-toast-message": "^2.2.1",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13"
   },

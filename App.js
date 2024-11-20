@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Animated, Alert  } from 'react-native';
+import { StyleSheet, Animated, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native';
+import Toast from 'react-native-toast-message';
 
 // CUSTOM SCREENS
 
@@ -42,7 +43,11 @@ export default function App() {
   // Start recording function
   const startRecording = async () => {
     if (!title) {
-      Alert.alert('Please enter a title to start recording.');
+      Toast.show({
+        type: 'warning',
+        text1: 'Warning',
+        text2: 'Please enter a title to start recording.',
+      });
       return;
     }
 
@@ -70,7 +75,55 @@ export default function App() {
       intervalRef.current = setInterval(() => setTime((prev) => prev + 1), 1000);
     } catch (err) {
       console.error('Failed to start recording:', err);
-      Alert.alert('Error starting recording:', err.message);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: `Error starting recording: ${err.message}`,
+      });
+    }
+  };
+
+
+  // Cancel recording function
+  const cancelRecording = () => {
+    if (isRecording) stopRecording();
+    setTime(0);
+    setRecording(null);
+    setRecordedURI(null);
+  };
+
+  // Save recording function
+  const saveRecording = async () => {
+
+    const recordingData = {
+      title,
+      uri: recordedURI,
+      duration: time,
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      const jsonData = JSON.stringify(recordingData);
+      await AsyncStorage.setItem(`recording_${Date.now()}`, jsonData);
+     
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Recording saved successfully!',
+      });
+
+      setTitle('');
+      setTime(0);
+      setRecordedURI(null);
+      changeView('play')
+    } catch (error) {
+      console.error('Error saving recording:', error);
+  
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to save recording.',
+      });
     }
   };
 
@@ -85,44 +138,9 @@ export default function App() {
       const uri = recording.getURI(); 
       setRecordedURI(uri);
       setRecording(null);
+      saveRecording();
     } catch (err) {
       console.error('Error stopping recording:', err);
-    }
-  };
-
-  // Cancel recording function
-  const cancelRecording = () => {
-    if (isRecording) stopRecording();
-    setTime(0);
-    setRecording(null);
-    setRecordedURI(null);
-  };
-
-  // Save recording function
-  const saveRecording = async () => {
-    if (!recordedURI || !title) {
-      Alert.alert('Please record audio and enter a title before saving.');
-      return;
-    }
-
-    const recordingData = {
-      title,
-      uri: recordedURI,
-      duration: time,
-      timestamp: new Date().toISOString(),
-    };
-
-    try {
-      const jsonData = JSON.stringify(recordingData);
-      await AsyncStorage.setItem(`recording_${Date.now()}`, jsonData);
-      Alert.alert('Recording saved successfully!');
-      setTitle('');
-      setTime(0);
-      setRecordedURI(null);
-      changeView('play')
-    } catch (error) {
-      console.error('Error saving recording:', error);
-      Alert.alert('Failed to save recording.');
     }
   };
 
@@ -156,7 +174,12 @@ export default function App() {
         setRecordings(recordings);
       } catch (error) {
         console.error('Failed to load recordings', error);
-        Alert.alert('Error', 'Failed to load recordings.');
+       
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to load recordings.',
+        });
       }
     };
   
@@ -233,6 +256,9 @@ export default function App() {
             setRecordings={setRecordings}
           />
         )}
+
+        {/* TOAST */}
+        <Toast />
 
 
         {/* STATUSBAR */}

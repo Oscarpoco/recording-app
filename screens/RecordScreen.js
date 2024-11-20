@@ -1,15 +1,7 @@
 
 import { StyleSheet, Text, View, Pressable, TextInput } from 'react-native';
 
-// REACT 
-import { useState, useRef  } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// EXPO
-import { Audio } from 'expo-av';
-
 // ICONS
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import Entypo from 'react-native-vector-icons/Entypo';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -21,7 +13,12 @@ export default function Record({changeView, title, setTitle, saveRecording, isRe
 
         <View style ={styles.returnButtonParent}>
           {/* BACK BUTTON */}
-          <Pressable style={styles.returnButton} onPress={() => changeView('play')}>
+          <Pressable style={styles.returnButton} 
+          onPress={() => {
+            changeView('play');
+            cancelRecording();
+          }
+          }>
             <MaterialCommunityIcons name="keyboard-backspace" size={40} color="#fff" />
           </Pressable>
     
@@ -164,7 +161,7 @@ const styles = StyleSheet.create({
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: 'rgba(255, 255, 255, .6)',
+      backgroundColor: 'rgba(255, 255, 255, .8)',
       borderRadius: 40,
       position: 'relative'
 
@@ -197,6 +194,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 5,
         paddingVertical: 10,
+        paddingHorizontal: 0,
         borderBottomWidth: 1,
         borderColor: 'rgba(255, 255, 255, .6)',
         width: '80%'
