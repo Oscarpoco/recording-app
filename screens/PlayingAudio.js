@@ -6,7 +6,8 @@ import {
   Pressable,
   Text,
   Alert,
-  ActivityIndicator
+  ActivityIndicator,
+  RefreshControl
 } from 'react-native';
 
 import Toast from 'react-native-toast-message';
@@ -35,7 +36,7 @@ import { format } from 'date-fns';
 
 
 
-export default function Play({ changeView, recordings, setRecordings }) {
+export default function Play({ changeView, recordings, setRecordings, onRefresh, refreshing }) {
 
   // STATES
   const [sound, setSound] = useState(null);
@@ -87,39 +88,40 @@ export default function Play({ changeView, recordings, setRecordings }) {
   const playRecording = useCallback(async (uri, key, recording) => {
     try {
       setIsLoading(true);
-
+      console.log(`Playing: ${uri}`); 
+  
       // Stop current playback if exists
       if (sound) {
         await sound.stopAsync();
         await sound.unloadAsync();
         setSound(null);
       }
-
+  
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri },
         { shouldPlay: true },
         onPlaybackStatusUpdate
       );
-
+  
       setSound(newSound);
       setCurrentlyPlaying(key);
       setCurrentRecording(recording);
-
     } catch (error) {
       console.error('Failed to play recording:', error);
-
       Toast.show({
         type: 'error',
         text1: 'Error',
         text2: 'Failed to play the recording.',
+        position: 'bottom',
       });
-
     } finally {
       setIsLoading(false);
     }
   }, []);
+  
 
   const onPlaybackStatusUpdate = useCallback((status) => {
+    console.log('Playback status update:', status);
     if (status.didJustFinish) {
       setCurrentlyPlaying(null);
       setCurrentRecording(null);
@@ -174,9 +176,11 @@ export default function Play({ changeView, recordings, setRecordings }) {
     try {
       if (sound) {
         await sound.stopAsync();
-        setCurrentlyPlaying(null);
-        setCurrentRecording(null);
+        await sound.unloadAsync(); // Ensure sound is unloaded
+        setSound(null);
       }
+      setCurrentlyPlaying(null);
+      setCurrentRecording(null);
     } catch (error) {
       console.error('Failed to stop playback:', error);
     }
@@ -195,6 +199,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
           type: 'error',
           text1: 'Error',
           text2: 'Sharing is not available on this device.',
+          position: 'bottom',
         });
 
       }
@@ -205,6 +210,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
         type: 'error',
         text1: 'Error',
         text2: 'Failed to share the recording.',
+        position: 'bottom',
       });
     }
   }, []);
@@ -226,6 +232,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
         type: 'success',
         text1: 'Success',
         text2: 'Recording deleted successfully.',
+        position: 'bottom',
       });
 
     } catch (error) {
@@ -235,6 +242,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
         type: 'error',
         text1: 'Error',
         text2: 'Failed to delete the recording.',
+        position: 'bottom',
       });
     }
   }, [currentRecording, stopPlayback, setRecordings]);
@@ -257,6 +265,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
       type: 'success',
       text1: 'Success',
       text2: 'Recording deleted successfully.',
+      position: 'bottom',
     });
   };
 
@@ -266,7 +275,7 @@ export default function Play({ changeView, recordings, setRecordings }) {
       <View style={styles.headerContent}>
         <View style={styles.searchContainer}>
           <View style={styles.searchParent}>
-            <Octicons name="search" size={25} color="rgba(255, 255, 255, .5)" />
+            <Octicons name="search" size={20} color="rgba(255, 255, 255, .5)" />
             <TextInput
               placeholder="Search your recordings"
               placeholderTextColor="rgba(255, 255, 255, .5)"
@@ -279,7 +288,13 @@ export default function Play({ changeView, recordings, setRecordings }) {
         </View>
 
         <View style={styles.myRecordings}>
-          <ScrollView style={styles.list}>
+          <ScrollView style={styles.list}
+          
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+
+          >
             {filteredRecordings.map((recording) => (
               <Pressable 
                 key={recording.key}
@@ -300,7 +315,9 @@ export default function Play({ changeView, recordings, setRecordings }) {
                     {isLoading && currentlyPlaying === recording.key ? (
                       <ActivityIndicator color="white" />
                     ) : (
-                     <View></View>
+                     <View style = {styles.editButton}>
+                        <MaterialIcons name="edit-note" size={40} color="rgba(255, 255, 255, .5)" />
+                     </View>
                     )}
                   </View>
                 </View>
@@ -650,7 +667,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    gap: 15,
+    gap: 10,
   },
 
   // SEARCH
@@ -661,10 +678,10 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     marginTop: 20,
-    padding: 10,
     paddingVertical: 5,
-    borderRadius: 10,
-    gap: 10,
+    paddingHorizontal: 20,
+    borderRadius: 50,
+    gap: 5,
   },
   searchInput: 
   {
@@ -672,6 +689,7 @@ const styles = StyleSheet.create({
     width: '85%',
     height: 40,
     textAlignVertical: 'center',
+    color: 'rgba(255, 255, 255, .5)'
   },
 
 //   RECORDING LIST
@@ -693,14 +711,14 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingVertical: 11,
     width: '100%',
-    borderRadius: 10,
-    marginBottom: 9,
+    borderRadius: 15,
+    marginBottom: 10.5,
     position: 'relative',
   },
   recordingText: 
   {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: 'bold',
   },
   recordingDuration: 
@@ -709,11 +727,15 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
-  playButton:
+  editButton:
   {
     position: 'absolute',
-    right: 20,
-    top: 20,
+    right: -5,
+    top: -43,
+    backgroundColor: 'rgba(255, 255, 255, .2)',
+    padding: 4,
+    zIndex: 1,
+    borderRadius: 10,
   },
 
   // FORM

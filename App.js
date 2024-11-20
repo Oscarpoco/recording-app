@@ -1,6 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Animated, Alert } from 'react-native';
-import { SafeAreaView } from 'react-native';
+import { StyleSheet, Animated, Alert, View,SafeAreaView } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 // CUSTOM SCREENS
@@ -36,42 +35,50 @@ export default function App() {
   const intervalRef = useRef(null);
   const [recording, setRecording] = useState(null);
   const [recordedURI, setRecordedURI] = useState(null); 
+  const [refreshing, setRefreshing] = useState(false);
+
 
   // ENDS
 
+
   // RECORDING FUNCTIONS
-  // Start recording function
+ 
   const startRecording = async () => {
     if (!title) {
       Toast.show({
-        type: 'warning',
+        type: 'error',
         text1: 'Warning',
         text2: 'Please enter a title to start recording.',
+        position: 'bottom',
       });
       return;
     }
-
+  
     try {
-      // Request audio recording permissions
+      // Stop ongoing recording
+      if (recording) {
+        await stopRecording();
+      }
+  
       const { granted } = await Audio.requestPermissionsAsync();
       if (!granted) {
         Alert.alert('Permission to access microphone is required!');
         return;
       }
-
-      // Prepare recording
+  
       await Audio.setAudioModeAsync({
         allowsRecordingIOS: true,
         playsInSilentModeIOS: true,
       });
-
-      const { recording } = await Audio.Recording.createAsync(
+  
+      const { recording: newRecording } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
-
-      setRecording(recording);
+  
+      setRecording(newRecording);
       setIsRecording(true);
       setTime(0);
+  
       intervalRef.current = setInterval(() => setTime((prev) => prev + 1), 1000);
     } catch (err) {
       console.error('Failed to start recording:', err);
@@ -79,9 +86,10 @@ export default function App() {
         type: 'error',
         text1: 'Error',
         text2: `Error starting recording: ${err.message}`,
+        position: 'bottom',
       });
     }
-  };
+  };  
 
 
   // Cancel recording function
@@ -94,28 +102,46 @@ export default function App() {
 
   // Save recording function
   const saveRecording = async () => {
-
-    const recordingData = {
-      title,
-      uri: recordedURI,
-      duration: time,
-      timestamp: new Date().toISOString(),
-    };
-
     try {
-      const jsonData = JSON.stringify(recordingData);
-      await AsyncStorage.setItem(`recording_${Date.now()}`, jsonData);
      
+      await stopRecording();
+      
+      
+      if (!recordedURI) {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Recording was not completed successfully.',
+          position: 'bottom',
+        });
+        return;
+      }
+  
+      const recordingData = {
+        title,
+        uri: recordedURI, 
+        duration: time,
+        timestamp: new Date().toISOString(),
+      };
+  
+      // Save the recording to AsyncStorage
+      const key = `recording_${Date.now()}`;
+      await AsyncStorage.setItem(key, JSON.stringify(recordingData));
+  
+      // Provide feedback to the user
       Toast.show({
         type: 'success',
         text1: 'Success',
         text2: 'Recording saved successfully!',
+        position: 'bottom',
       });
-
+  
+      // Reset state
+      setRecordings((prev) => [...prev, { ...recordingData, key }]);
       setTitle('');
       setTime(0);
       setRecordedURI(null);
-      changeView('play')
+      changeView('play');
     } catch (error) {
       console.error('Error saving recording:', error);
   
@@ -123,26 +149,41 @@ export default function App() {
         type: 'error',
         text1: 'Error',
         text2: 'Failed to save recording.',
+        position: 'bottom',
       });
     }
   };
+  
 
   // Stop recording function
   const stopRecording = async () => {
     if (!recording) return;
-
+  
     clearInterval(intervalRef.current);
     setIsRecording(false);
+  
     try {
       await recording.stopAndUnloadAsync();
-      const uri = recording.getURI(); 
-      setRecordedURI(uri);
-      setRecording(null);
-      saveRecording();
+      const uri = recording.getURI();
+      if (!uri) throw new Error('Recording URI is null');
+  
+      setRecordedURI(uri); 
+
     } catch (err) {
       console.error('Error stopping recording:', err);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: `Error stopping recording: ${err.message}`,
+        position: 'bottom',
+      });
+      setRecordedURI(null); 
+    } finally {
+      setRecording(null);
     }
   };
+  
+  
 
   // Format time
   const formatTime = (seconds) => {
@@ -179,14 +220,52 @@ export default function App() {
           type: 'error',
           text1: 'Error',
           text2: 'Failed to load recordings.',
+          position: 'bottom',
         });
       }
     };
   
     loadRecordings();
   }, [recordings]);
+
+  // REFRESH
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      // Logic to reload recordings (e.g., fetching from AsyncStorage or API)
+      const keys = await AsyncStorage.getAllKeys();
+      const storedRecordings = await AsyncStorage.multiGet(keys);
+      const updatedRecordings = storedRecordings.map(([key, value]) => ({
+        key,
+        ...JSON.parse(value),
+      }));
+
+      setRecordings(updatedRecordings);
+      Toast.show({
+        type: 'success',
+        text1: 'Refreshed',
+        text2: 'Recordings list updated.',
+        position: 'bottom',
+      });
+    } catch (error) {
+      console.error('Failed to refresh recordings:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to refresh recordings.',
+        position: 'bottom',
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  };
   
   // ENDS
+
+    
+    const saved = recordings;
+    // console.log('My recordings:', saved);
+
 
   // USE EFFECT TO AUTOMATICALLY CHANGE VIEW AFTER 2 SECONDS
   useEffect(() => {
@@ -254,11 +333,15 @@ export default function App() {
             changeView={changeView} 
             recordings={recordings}
             setRecordings={setRecordings}
+            refreshing = {refreshing}
+            onRefresh={onRefresh}
           />
         )}
 
         {/* TOAST */}
-        <Toast />
+        <View style={styles.toast}>
+          <Toast />
+        </View>
 
 
         {/* STATUSBAR */}
@@ -277,6 +360,16 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative'
+  },
+
+  toast: 
+  {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 50
   },
 
 });

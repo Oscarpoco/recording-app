@@ -16,7 +16,6 @@ export default function Record({changeView, title, setTitle, saveRecording, isRe
           <Pressable style={styles.returnButton} 
           onPress={() => {
             changeView('play');
-            cancelRecording();
           }
           }>
             <MaterialCommunityIcons name="keyboard-backspace" size={40} color="#fff" />
@@ -67,9 +66,16 @@ export default function Record({changeView, title, setTitle, saveRecording, isRe
               />
             </Pressable>
     
-            <Pressable style={styles.navChild} onPress={saveRecording}>
-              <MaterialIcons name="done" size={30} color="#333" />
-            </Pressable>
+            {!isRecording ? (
+
+              <Pressable style={styles.navChild} onPress={saveRecording}>
+                <MaterialIcons name="done" size={30} color="#333" />
+              </Pressable>
+            ):(
+              <Pressable style={[styles.navChild, {backgroundColor: 'rgba(255, 255, 255, .0)'}]} onPress={cancelRecording}>
+
+              </Pressable>
+            )}
           </View>
         </View>
       </View>
