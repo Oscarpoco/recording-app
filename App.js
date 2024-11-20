@@ -36,6 +36,7 @@ export default function App() {
   const [recording, setRecording] = useState(null);
   const [recordedURI, setRecordedURI] = useState(null); 
   const [refreshing, setRefreshing] = useState(false);
+  const [isEditting, setIsEditting] = useState(true);
 
 
   // ENDS
@@ -335,6 +336,8 @@ export default function App() {
             setRecordings={setRecordings}
             refreshing = {refreshing}
             onRefresh={onRefresh}
+            isEditting={isEditting}
+            setIsEditting={setIsEditting}
           />
         )}
 

@@ -36,7 +36,7 @@ import { format } from 'date-fns';
 
 
 
-export default function Play({ changeView, recordings, setRecordings, onRefresh, refreshing }) {
+export default function Play({ changeView, recordings, setRecordings, onRefresh, refreshing, isEditting, setIsEditting }) {
 
   // STATES
   const [sound, setSound] = useState(null);
@@ -315,8 +315,10 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
                     {isLoading && currentlyPlaying === recording.key ? (
                       <ActivityIndicator color="white" />
                     ) : (
-                     <View style = {styles.editButton}>
-                        <MaterialIcons name="edit-note" size={40} color="rgba(255, 255, 255, .5)" />
+                     <View style = {styles.editButton} >
+                        <Pressable onPress={()=> setIsEditting(true)}>
+                          <MaterialIcons name="edit-note" size={40} color="rgba(255, 255, 255, .5)" />
+                        </Pressable>
                      </View>
                     )}
                   </View>
@@ -325,6 +327,8 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
             ))}
           </ScrollView>
         </View>
+
+        
       </View>
 
       {currentRecording ? (
@@ -526,6 +530,32 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
       )
 
     }
+
+        {/* EDDITING */}
+        {isEditting &&(
+          <View style={styles.editingParent} >
+
+            <Pressable
+              style={styles.editingOverlay}
+              onPress={() => setIsEditting(false)} 
+            />
+
+            <View style={styles.editingChild}>
+              <Text style={styles.editTitleText}>Edit  title</Text>
+              <View style={styles.editInputWrapper}>
+                <TextInput
+                placeholder='Type a new title'
+                ></TextInput>
+                <Pressable>
+                  <Text style={styles.editButtonText}>Save</Text>
+                </Pressable>
+              </View>
+            </View>
+          
+          </View>
+        )}
+        {/* ENDS */}
+
     </View>
   );
 }
@@ -678,14 +708,14 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     marginTop: 20,
-    paddingVertical: 5,
+    paddingVertical: 0,
     paddingHorizontal: 20,
     borderRadius: 50,
     gap: 5,
   },
   searchInput: 
   {
-    fontSize: 16,
+    fontSize: 15,
     width: '85%',
     height: 40,
     textAlignVertical: 'center',
@@ -707,7 +737,7 @@ const styles = StyleSheet.create({
 
   recordingItem: 
   {
-    backgroundColor: '#444',
+    backgroundColor: '#333',
     padding: 10,
     paddingVertical: 11,
     width: '100%',
@@ -732,10 +762,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -5,
     top: -43,
-    backgroundColor: 'rgba(255, 255, 255, .2)',
+    backgroundColor: '#444',
     padding: 4,
-    zIndex: 1,
-    borderRadius: 10,
+    zIndex: 11,
+    borderRadius: 11,
   },
 
   // FORM
@@ -839,6 +869,70 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     paddingHorizontal: 10,
     width: '100%'
+  },
+
+  editingParent:
+  {
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, .7)',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    position: 'absolute',
+    flex: 1,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingVertical: 50,
+    paddingHorizontal: 10,
+  },
+
+  editingChild:
+  {
+    width: '100%',
+    height: 'auto',
+    backgroundColor: 'rgba(255, 255, 255, .9)',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    gap: 20
+  },
+
+  editInputWrapper:
+  {
+    width: '100%',
+    height: 'auto',
+    backgroundColor: 'rgba(255, 255, 255, .9)',
+    justifyContent: 'space-between',
+    borderRadius: 10,
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    zIndex: 20
+  },
+
+  editButtonText:
+  {
+    color: '#000',
+    fontSize: 18,
+    fontWeight: 900
+  },
+
+  editTitleText:
+  {
+    color: '#000',
+    fontSize: 24,
+    fontWeight: 900
+  },
+
+  editingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
 
 });
