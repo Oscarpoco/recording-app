@@ -1,5 +1,5 @@
 
-import { StyleSheet, Text, View, Pressable, TextInput } from 'react-native';
+import { StyleSheet, Text, View, Pressable, TextInput, TouchableOpacity } from 'react-native';
 
 // ICONS
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -13,13 +13,13 @@ export default function Record({changeView, title, setTitle, saveRecording, isRe
 
         <View style ={styles.returnButtonParent}>
           {/* BACK BUTTON */}
-          <Pressable style={styles.returnButton} 
+          <TouchableOpacity style={styles.returnButton} 
           onPress={() => {
             changeView('play');
           }
           }>
             <MaterialCommunityIcons name="keyboard-backspace" size={40} color="#fff" />
-          </Pressable>
+          </TouchableOpacity>
     
           {/* TITLE */}
           <TextInput
@@ -54,27 +54,27 @@ export default function Record({changeView, title, setTitle, saveRecording, isRe
     
           {/* BOTTOM NAV */}
           <View style={styles.navParent}>
-            <Pressable style={styles.navChild} onPress={cancelRecording}>
+            <TouchableOpacity style={styles.navChild} onPress={cancelRecording}>
               <Entypo name="cross" size={30} color="#333" />
-            </Pressable>
+            </TouchableOpacity>
     
-            <Pressable style={styles.navSibling} onPress={isRecording ? stopRecording : startRecording}>
+            <TouchableOpacity style={styles.navSibling} onPress={isRecording ? stopRecording : startRecording}>
               <MaterialCommunityIcons
                 name={isRecording ? 'pause-circle' : 'record-circle'}
                 size={50}
                 color="#FF0000"
               />
-            </Pressable>
+            </TouchableOpacity>
     
             {!isRecording ? (
 
-              <Pressable style={styles.navChild} onPress={saveRecording}>
+              <TouchableOpacity style={styles.navChild} onPress={saveRecording}>
                 <MaterialIcons name="done" size={30} color="#333" />
-              </Pressable>
+              </TouchableOpacity>
             ):(
-              <Pressable style={[styles.navChild, {backgroundColor: 'rgba(255, 255, 255, .0)'}]} onPress={cancelRecording}>
+              <TouchableOpacity style={[styles.navChild, {backgroundColor: 'rgba(255, 255, 255, .0)'}]} onPress={cancelRecording}>
 
-              </Pressable>
+              </TouchableOpacity>
             )}
           </View>
         </View>

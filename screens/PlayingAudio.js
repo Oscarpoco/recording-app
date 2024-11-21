@@ -3,12 +3,12 @@ import {
   TextInput,
   View,
   ScrollView,
-  Pressable,
   Text,
   Alert,
   ActivityIndicator,
   RefreshControl,
-  Image
+  Image,
+  TouchableOpacity
 } from 'react-native';
 
 import Toast from 'react-native-toast-message';
@@ -278,12 +278,12 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
 
           <View style={styles.AccountHeader}>
               <Text style={styles.AccountText}>Welcome back Oscar</Text>
-              <Pressable onPress={()=> changeView('profile')}>
+              <TouchableOpacity onPress={()=> changeView('profile')}>
                 <Image
                   source={require('../assets/user.jpg')} 
                   style={styles.image}
                 />
-              </Pressable>
+              </TouchableOpacity>
           </View>
 
           <View style={styles.searchParent}>
@@ -308,7 +308,7 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
 
           >
             {filteredRecordings.map((recording) => (
-              <Pressable 
+              <TouchableOpacity 
                 key={recording.key}
                 onPress={() =>
                   currentlyPlaying === recording.key
@@ -328,14 +328,14 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
                       <ActivityIndicator color="white" />
                     ) : (
                      <View style = {styles.editButton} >
-                        <Pressable onPress={()=> setIsEditting(true)}>
+                        <TouchableOpacity onPress={()=> setIsEditting(true)}>
                           <MaterialIcons name="edit-note" size={40} color="rgba(255, 255, 255, .5)" />
-                        </Pressable>
+                        </TouchableOpacity>
                      </View>
                     )}
                   </View>
                 </View>
-              </Pressable>
+              </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
@@ -362,18 +362,18 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
             </View>
 
             <View style={styles.actionsButtons}>
-              <Pressable 
+              <TouchableOpacity 
                 onPress={() => deleteRecording(currentRecording.key)}
                 
               >
                 <MaterialCommunityIcons name="delete" size={25} color="#FFF" />
-              </Pressable>
+              </TouchableOpacity>
 
-              <Pressable onPress={rewind}>
+              <TouchableOpacity onPress={rewind}>
                 <Entypo name="ccw" size={30} color="#FFF" />
-              </Pressable>
+              </TouchableOpacity>
 
-              <Pressable 
+              <TouchableOpacity 
                 onPress={() => 
                   currentlyPlaying === currentRecording.key
                     ? stopPlayback()
@@ -386,26 +386,26 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
                   size={50}
                   color={currentlyPlaying === currentRecording.key ? 'red' : '#fff'}
                 />
-              </Pressable>
+              </TouchableOpacity>
             
 
-              <Pressable onPress={fastForward} >
+              <TouchableOpacity onPress={fastForward} >
                 <Entypo name="cw" size={30} color="#FFF" />
-              </Pressable>
+              </TouchableOpacity>
 
-              <Pressable 
+              <TouchableOpacity 
                 onPress={() => shareRecording(currentRecording.uri)}
               
               >
                 <Octicons name="share-android" size={20} color="#FFF" />
-              </Pressable>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
       ) : (
 
         <View style={styles.recordButtonParent}>
-          <Pressable 
+          <TouchableOpacity 
             onPress={() => setSettings(true)}
             style={styles.navSettings}
           >
@@ -414,9 +414,9 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
               size={40} 
               color="#FFF" 
             />
-          </Pressable>
+          </TouchableOpacity>
           
-          <Pressable 
+          <TouchableOpacity 
             onPress={() => changeView('record')}
             style={styles.navSibling}
           >
@@ -425,7 +425,7 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
               size={45} 
               color="#FF0000" 
             />
-          </Pressable>
+          </TouchableOpacity>
         </View>
       )}
 
@@ -436,9 +436,9 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
       (
         <View style={styles.settingsParent}>
             <View style={styles.returnButtonIcon}>
-              <Pressable onPress={() =>setSettings(false)}>
+              <TouchableOpacity onPress={() =>setSettings(false)}>
                 <MaterialCommunityIcons name="keyboard-backspace" size={40} color="#fff" />
-              </Pressable>
+              </TouchableOpacity>
             </View>
 
             <View style={styles.settingsChild}>
@@ -485,21 +485,21 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
                 </View>
 
                 {/* Submit Button */}
-                <Pressable style={styles.button} onPress={handleSubmit}>
+                <TouchableOpacity style={styles.button} onPress={handleSubmit}>
                   <Text style={styles.buttonText}>Submit</Text>
-                </Pressable>
+                </TouchableOpacity>
               
 
                 <View style={styles.reachUsParent}>
 
                     <View style={styles.reachUsChild}>
-                      <Pressable style={styles.circleIcon}>
+                      <TouchableOpacity style={styles.circleIcon}>
                         <Entypo 
                           name="email" 
                           size={25} 
                           color="rgba(255, 255, 255, .7)" 
                         />
-                      </Pressable>
+                      </TouchableOpacity>
 
                       <Text style={styles.reachUsText}>m@support.co.za</Text>
 
@@ -507,26 +507,26 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
 
                     <View style={styles.reachUsChild}>
 
-                      <Pressable style={styles.circleIcon}>
+                      <TouchableOpacity style={styles.circleIcon}>
                         <MaterialIcons 
                           name="phone-android" 
                           size={25} 
                           color="rgba(255, 255, 255, .7)" 
                         />
-                      </Pressable>
+                      </TouchableOpacity>
 
                       <Text style={styles.reachUsText}>+27 660 850 741</Text>
                       
                     </View>
 
                     <View style={styles.reachUsChild}>
-                      <Pressable style={styles.circleIcon}>
+                      <TouchableOpacity style={styles.circleIcon}>
                         <MaterialIcons 
                           name="phone-android" 
                           size={25} 
                           color="rgba(255, 255, 255, .7)" 
                         />
-                      </Pressable>
+                      </TouchableOpacity>
                       
                       <Text style={styles.reachUsText}>+27 810 449 718</Text>
                       
@@ -547,7 +547,7 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
         {isEditting &&(
           <View style={styles.editingParent} >
 
-            <Pressable
+            <TouchableOpacity
               style={styles.editingOverlay}
               onPress={() => setIsEditting(false)} 
             />
@@ -558,9 +558,9 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
                 <TextInput
                 placeholder='Type a new title'
                 ></TextInput>
-                <Pressable>
+                <TouchableOpacity>
                   <Text style={styles.editButtonText}>Save</Text>
-                </Pressable>
+                </TouchableOpacity>
               </View>
             </View>
           

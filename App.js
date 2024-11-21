@@ -9,6 +9,7 @@ import Splash from './screens/splashScreen.js';
 import Play from './screens/PlayingAudio.js';
 import Account from './screens/Account.js';
 import SignIn from './screens/SignIn.js';
+import SignUp from './screens/SignUp.js';
 import ErrorPage from './screens/Error.js';
 
 // ENDS
@@ -275,8 +276,8 @@ export default function App() {
   // USE EFFECT TO AUTOMATICALLY CHANGE VIEW AFTER 2 SECONDS
   useEffect(() => {
     const timer = setTimeout(() => {
-      setView('play'); 
-    }, 2500);
+      setView('sign'); 
+    }, 3000);
 
     return () => clearTimeout(timer); 
   }, []);
@@ -354,10 +355,19 @@ export default function App() {
           />
 
         ) : view === 'sign' ? (
-          <SignIn/>
-        ) : 
-        (
-            <ErrorPage/>
+          <SignIn
+          
+          changeView={changeView}
+
+          />
+        ) : view === 'signUp' ? (
+            <SignUp
+            
+            changeView={changeView}
+            
+            />
+        ) : (
+          <ErrorPage/>
         )
       
       

@@ -3,8 +3,8 @@ import
     View,
     StyleSheet,
     Text,
-    Pressable,
-    Image
+    Image,
+    TouchableOpacity
 }
 from 'react-native';
 
@@ -23,9 +23,9 @@ export default function Account({changeView}){
             {/* HEADER */}
             <View style={styles.accountChild}>
 
-                <Pressable style={styles.accountHeaderButton} onPress={()=> changeView('play')}>
+                <TouchableOpacity style={styles.accountHeaderButton} onPress={()=> changeView('play')}>
                     <MaterialCommunityIcons name="keyboard-backspace" size={35} color="#fff" />
-                </Pressable>
+                </TouchableOpacity>
 
             </View>
             {/* ENDS */}
@@ -64,19 +64,19 @@ export default function Account({changeView}){
                     
                     <View style={styles.accountChildContentItem}>
 
-                        <Pressable style={styles.accountChildContentItemButtonWrap}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <AntDesign name="profile" size={15} color="#333" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Edit profile</Text>
-                        </Pressable>
+                        </TouchableOpacity>
 
-                        <Pressable style={styles.accountChildContentItemButtonWrap}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <MaterialIcons name="password" size={15} color="#333" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Change password</Text>
-                        </Pressable>
+                        </TouchableOpacity>
 
                     </View>
 
@@ -84,37 +84,37 @@ export default function Account({changeView}){
 
                     <View style={styles.accountChildContentItem}>
 
-                        <Pressable style={styles.accountChildContentItemButtonWrap}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <MaterialIcons name="backup" size={15} color="#333" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Backup</Text>
-                        </Pressable>
+                        </TouchableOpacity>
 
                     </View>
 
                     {/* THIRD SECTION */}
                     <View style={styles.accountChildContentItem}>
-                        <Pressable style={styles.accountChildContentItemButtonWrap}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <MaterialCommunityIcons name="lock" size={15} color="#333" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Security & privacy</Text>
-                        </Pressable>
+                        </TouchableOpacity>
 
-                        <Pressable style={styles.accountChildContentItemButtonWrap}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <MaterialIcons name="feedback" size={15} color="#333" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Feedback</Text>
-                        </Pressable>
+                        </TouchableOpacity>
 
-                        <Pressable style={styles.accountChildContentItemButtonWrap}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> changeView('signUp')}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <MaterialCommunityIcons name="logout" size={15} color="#333" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Logout</Text>
-                        </Pressable>
+                        </TouchableOpacity>
 
                     </View>
 
