@@ -4,9 +4,12 @@ import Toast from 'react-native-toast-message';
 
 // CUSTOM SCREENS
 
-import Record from './screens/RecordScreen';
-import Splash from './screens/splashScreen';
-import Play from './screens/PlayingAudio';
+import Record from './screens/RecordScreen.js';
+import Splash from './screens/splashScreen.js';
+import Play from './screens/PlayingAudio.js';
+import Account from './screens/Account.js';
+import SignIn from './screens/SignIn.js';
+import ErrorPage from './screens/Error.js';
 
 // ENDS
 
@@ -36,7 +39,8 @@ export default function App() {
   const [recording, setRecording] = useState(null);
   const [recordedURI, setRecordedURI] = useState(null); 
   const [refreshing, setRefreshing] = useState(false);
-  const [isEditting, setIsEditting] = useState(true);
+  const [isEditting, setIsEditting] = useState(false);
+  const [isProfile, setIsProfile] = useState(false);
 
 
   // ENDS
@@ -310,7 +314,9 @@ export default function App() {
 
         {/* RENDERING SCREENS */}
 
-        {view === 'splash' ? (
+        {
+        
+        view === 'splash' ? (
           <Splash />
 
 
@@ -329,7 +335,7 @@ export default function App() {
 
           />
 
-        ) : (
+        ) : view === 'play' ? (
           <Play 
             changeView={changeView} 
             recordings={recordings}
@@ -338,8 +344,24 @@ export default function App() {
             onRefresh={onRefresh}
             isEditting={isEditting}
             setIsEditting={setIsEditting}
+            setIsProfile={setIsProfile}
           />
-        )}
+        ) : view === 'profile' ? (
+          <Account
+
+          changeView={changeView}
+
+          />
+
+        ) : view === 'sign' ? (
+          <SignIn/>
+        ) : 
+        (
+            <ErrorPage/>
+        )
+      
+      
+      }
 
         {/* TOAST */}
         <View style={styles.toast}>

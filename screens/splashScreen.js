@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, Text, View, Image, Animated, Dimensions } from 'react-native';
+import { StyleSheet, View, Image, Animated } from 'react-native';
 
 export default function Splash() {
-  // Screen dimensions
-  const { width, height } = Dimensions.get('window');
 
   // Animation references
   const opacity = useRef(new Animated.Value(0)).current;
@@ -11,10 +9,6 @@ export default function Splash() {
   const rotateValue = useRef(new Animated.Value(0)).current;
   const scaleValue = useRef(new Animated.Value(0.8)).current;
 
-  // Additional animation values for new elements
-  const circleOpacity = useRef(new Animated.Value(0)).current;
-  const circleScale = useRef(new Animated.Value(0.5)).current;
-  const waveOpacity = useRef(new Animated.Value(0)).current;
 
   // Animation function
   const animateSplash = () => {
@@ -42,31 +36,13 @@ export default function Splash() {
           useNativeDriver: true,
         })
       ]),
-      
-      // Additional element animations
-      Animated.parallel([
-        Animated.timing(circleOpacity, {
-          toValue: 0.5,
-          duration: 600,
-          useNativeDriver: true,
-        }),
-        Animated.spring(circleScale, {
-          toValue: 1,
-          friction: 3,
-          useNativeDriver: true,
-        }),
-        Animated.timing(waveOpacity, {
-          toValue: 0.3,
-          duration: 800,
-          useNativeDriver: true,
-        })
-      ]),
+
 
       // Fade out sequence
       Animated.timing(opacity, {
         toValue: 0,
-        delay: 2000,
-        duration: 800,
+        delay: 3000,
+        duration: 2000,
         useNativeDriver: true,
       })
     ]).start();
@@ -85,52 +61,36 @@ export default function Splash() {
 
   return (
     <View style={styles.splashParent}>
-      {/* Animated Wave Background */}
-      <Animated.View 
-        style={[
-          styles.waveBackground, 
-          { 
-            opacity: waveOpacity,
-            transform: [
-              { scale: circleScale },
-            ]
-          }
-        ]}
-      />
 
-      {/* Animated Circle */}
-      <Animated.View 
-        style={[
-          styles.animatedCircle, 
-          { 
-            opacity: circleOpacity,
-            transform: [
-              { scale: circleScale }
-            ]
-          }
-        ]}
-      />
+      
 
-      {/* FIRST CHILD */}
-      <Animated.View
-        style={[
-          styles.firstChild,
-          { 
-            opacity, 
-            transform: [
-              { translateY },
-              { rotate: rotation },
-              { scale: scaleValue }
-            ] 
-          },
-        ]}
-      >
-        <Image
-          source={require('../assets/download.jpg')} 
-          style={styles.image}
-        />
-      </Animated.View>
+          <Image 
+            source={require('../assets/splashScreen.jpg')} 
+            style={styles.Backgroundimage}
+          />
 
+        <View style={[styles.splashSecondParent, styles.blurOverlay]}>
+
+        {/* FIRST CHILD */}
+        <Animated.View
+          style={[
+            styles.firstChild,
+            { 
+              opacity, 
+              transform: [
+                { translateY },
+                { rotate: rotation },
+                { scale: scaleValue }
+              ] 
+            },
+          ]}
+        >
+          <Image
+            source={require('../assets/download.jpg')} 
+            style={styles.image}
+          />
+        </Animated.View>
+      </View>
     </View>
   );
 }
@@ -149,6 +109,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
     backgroundColor: '#000',
+    position: 'relative'
+  },
+
+  splashSecondParent: 
+  {
+    width: '100%',
+    height: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    backgroundColor: 'rgba(255, 255, 255, .3)',
+    position: 'absolute'
+
+  },
+
+  blurOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)', 
+    backdropFilter: 'blur(10px)',
+  },
+
+  Backgroundimage:
+  {
+    width: '100%',
+    height: '100%',
+    position: 'absolute', 
+    top: 0,
+    left: 0,
+    resizeMode: 'cover',
   },
     //   ENDS
 
@@ -156,9 +146,9 @@ const styles = StyleSheet.create({
 
     firstChild: 
     {
-        width: 300,
-        height: 300,
-        backgroundColor: 'rgba(255, 255, 255, .3)',
+        width: 200,
+        height: 200,
+        backgroundColor: 'rgba(255, 255, 255, .5)',
         borderRadius: 150,
         justifyContent: 'center',
         alignItems: 'center',
@@ -209,3 +199,4 @@ const styles = StyleSheet.create({
       }
 
 });
+

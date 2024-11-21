@@ -7,14 +7,15 @@ import {
   Text,
   Alert,
   ActivityIndicator,
-  RefreshControl
+  RefreshControl,
+  Image
 } from 'react-native';
 
 import Toast from 'react-native-toast-message';
 
 
 // SCREEN 
-import MusicPlayer from './ProgressBar';
+import MusicPlayer from './ProgressBar.js';
 
 // REACT
 import React, { useEffect, useState, useCallback } from 'react';
@@ -36,7 +37,7 @@ import { format } from 'date-fns';
 
 
 
-export default function Play({ changeView, recordings, setRecordings, onRefresh, refreshing, isEditting, setIsEditting }) {
+export default function Play({ changeView, recordings, setRecordings, onRefresh, refreshing, isEditting, setIsEditting, setIsProfile }) {
 
   // STATES
   const [sound, setSound] = useState(null);
@@ -274,6 +275,17 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
 
       <View style={styles.headerContent}>
         <View style={styles.searchContainer}>
+
+          <View style={styles.AccountHeader}>
+              <Text style={styles.AccountText}>Welcome back Oscar</Text>
+              <Pressable onPress={()=> changeView('profile')}>
+                <Image
+                  source={require('../assets/user.jpg')} 
+                  style={styles.image}
+                />
+              </Pressable>
+          </View>
+
           <View style={styles.searchParent}>
             <Octicons name="search" size={20} color="rgba(255, 255, 255, .5)" />
             <TextInput
@@ -568,11 +580,10 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     position: 'relative',
     backgroundColor: '#000',
     paddingVertical: 20,
-    position: 'relative'
   },
 
   recordButtonParent:
@@ -710,8 +721,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingVertical: 0,
     paddingHorizontal: 20,
-    borderRadius: 50,
-    gap: 5,
+    borderRadius: 10,
+    gap: 10,
+    opacity: .5
   },
   searchInput: 
   {
@@ -722,10 +734,34 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, .5)'
   },
 
+  AccountHeader:
+  {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 7,
+    paddingTop: 25,
+  },
+
+  image:
+  {
+    width: 40,
+    height: 40,
+    borderRadius: 50
+  },
+
+  AccountText:
+  {
+    color: 'rgba(255, 255, 255, .7)',
+    fontSize: 18,
+    fontWeight: 900,
+
+  },
+
 //   RECORDING LIST
   myRecordings: 
   {
-    height: '90%',
+    height: '80%',
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -733,6 +769,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderBottomColor: 'rgba(255, 255, 255, .2)',
     paddingHorizontal: 7,
+    marginTop: 15,
+
   },
 
   recordingItem: 
@@ -751,6 +789,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: 'bold',
   },
+
   recordingDuration: 
   {
     color: '#ccc',
