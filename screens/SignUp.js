@@ -6,7 +6,6 @@ import {
     TextInput,
     TouchableOpacity,
     Image,
-    Alert,
 } from 'react-native';
 
 import Toast from 'react-native-toast-message';
@@ -21,13 +20,13 @@ export default function SignUp(
         setShowPassword,
         password,
         setPassword,
-        fullNames,
         email,
         setEmail, 
-        register
+        register,
+        confirmPassword,
+        setConfirmPassword
     }) {
     
-    const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleRegister = () => {
         if (!email || !password || !confirmPassword) {
@@ -59,7 +58,7 @@ export default function SignUp(
                     });
         }
 
-        register({email, password})
+        register()
         Toast.show({
             type: 'success',
             text1: 'Success',

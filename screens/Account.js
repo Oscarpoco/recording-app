@@ -14,7 +14,10 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 
-export default function Account({changeView, setSettings, isToggled, toggleButton, logout}){
+export default function Account({changeView, setSettings, isToggled, toggleButton, logout, userInformation, sendPasswordReset, }){
+
+
+    const userEmail = userInformation.email || '';
 
 
     return(
@@ -67,7 +70,7 @@ export default function Account({changeView, setSettings, isToggled, toggleButto
                 <View style={styles.thirdAccountChildContent}>
 
                     <View style={styles.accountChildContentAbout}>
-                        <Text style={styles.accountText}>Oscar Poco</Text>
+                        <Text style={styles.accountText}>{userInformation.email || User}</Text>
                         <Text style={styles.accountTextBio}>I am a Software developer</Text>
                     </View>
 
@@ -82,7 +85,7 @@ export default function Account({changeView, setSettings, isToggled, toggleButto
                             <Text style={styles.accountChildContentItemButtonText}>Edit profile</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> sendPasswordReset(userEmail)}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <MaterialIcons name="password" size={15} color="#333" />
                             </View>

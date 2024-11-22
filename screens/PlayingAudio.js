@@ -37,7 +37,21 @@ import { format } from 'date-fns';
 
 
 
-export default function Play({ changeView, recordings, setRecordings, onRefresh, refreshing, isEditting, setIsEditting, setIsProfile, settings, setSettings }) {
+export default function Play(
+  { 
+    changeView, 
+    recordings, 
+    setRecordings, 
+    onRefresh, 
+    refreshing, 
+    isEditting, 
+    setIsEditting, 
+    setIsProfile, 
+    settings, 
+    setSettings,
+    userInformation 
+  }) 
+  {
 
   // STATES
   const [sound, setSound] = useState(null);
@@ -276,7 +290,7 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
         <View style={styles.searchContainer}>
 
           <View style={styles.AccountHeader}>
-              <Text style={styles.AccountText}>Welcome back Oscar</Text>
+              <Text style={styles.AccountText}>Welcome back {userInformation.email || User}</Text>
               <TouchableOpacity onPress={()=> changeView('profile')}>
                 <Image
                   source={require('../assets/user.jpg')} 

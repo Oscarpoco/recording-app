@@ -22,7 +22,7 @@ import { useState, useEffect, useRef } from 'react';
 
 // FIREBASE
 import { auth } from './firebase/config.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail  } from "firebase/auth";
 
 // EXPO
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -47,28 +47,41 @@ export default function App() {
   const [isEditting, setIsEditting] = useState(false);
   const [settings, setSettings] = useState(false);
   const [isProfile, setIsProfile] = useState(false);
+  const [userInformation, setUserInformation] = useState(null);
   const [isToggled, setIsToggled] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [fullNames, setFullNames] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
 
 
   // FIREBASE REGISTER AND LOGIN
 
   // Check for authenticated user
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("User logged in:", user);
-        setView("play"); 
-      } else {
-        console.log("No user logged in");
-        setView("sign"); 
-      }
-    });
-    return unsubscribe; 
-  }, []);
+    useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          
+          try {
+            await AsyncStorage.setItem('user', JSON.stringify(user));
+            setUserInformation(user);
+          } catch (error) {
+            console.error("Error saving user to AsyncStorage:", error);
+          }
+          setView("play");
+        } else {
+          console.log("No user logged in");
+          setView("sign"); 
+        }
+      });
+  
+      // Clean up the listener on unmount
+      return unsubscribe;
+    }, []);
+
+ 
 
 
   // Function to handle user registration
@@ -95,12 +108,24 @@ export default function App() {
       });
       
       setView("play");
+      setPassword('');
+      setEmail('');
+      setConfirmPassword('');
+
     } catch (error) {
-      console.error("Registration Error:", error.message);
+      console.error("Registration Error:", error.code, error.message);
+      let errorMessage = "Registration Failed";
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "This email is already in use.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "Password should be at least 6 characters.";
+      }
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: "Registration Failed",
+        text2: errorMessage,
         position: 'bottom',
       });
     
@@ -130,18 +155,32 @@ export default function App() {
         position: 'bottom',
       });
 
+      console.log('my info', userInformation)
+
       setView("play");
+      setPassword('');
+      setEmail('');
+      setConfirmPassword('');
+
     } catch (error) {
-      console.error("Login Error:", error.message);
-     
+      console.error("Login Error:", error.code, error.message);
+      let errorMessage = "Login Failed";
+      if (error.code === "auth/wrong-password") {
+        errorMessage = "Incorrect password.";
+      } else if (error.code === "auth/user-not-found") {
+        errorMessage = "No user found with this email.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Invalid email address.";
+      }
       Toast.show({
         type: 'error',
         text1: 'Error',
-        text2: "Login Failed",
+        text2: errorMessage,
         position: 'bottom',
       });
     }
   };
+
 
   // Function to log out
   const logout = async () => {
@@ -154,6 +193,8 @@ export default function App() {
         text2: "You have been logged out.",
         position: 'bottom',
       });
+
+      setUserInformation(null)
       setView("sign");
     } catch (error) {
       console.error("Logout Error:", error.message);
@@ -164,6 +205,53 @@ export default function App() {
         text2: "Logout Failed",
         position: 'bottom',
       });
+    }
+  };
+
+  // RESET PASSWORD
+  const sendPasswordReset = async (email) => {
+  
+    try {
+      await sendPasswordResetEmail(auth, email);
+      console.log('Password reset email sent successfully');
+      
+      Toast.show({
+        type: 'success',
+        text1: 'Password Reset Email Sent',
+        text2: 'Check your email to reset your password.',
+        position: 'bottom',
+        duration: 3000
+      });
+
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      
+      // Handle specific errors
+      if (error.code === 'auth/user-not-found') {
+        console.log('No user found with this email address.');
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'No user found with this email.',
+          position: 'bottom',
+        });
+      } else if (error.code === 'auth/invalid-email') {
+        console.log('The email address is invalid.');
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'The email address is invalid.',
+          position: 'bottom',
+        });
+      } else {
+        console.log('Error sending reset email:', error.message);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: error.message,
+          position: 'bottom',
+        });
+      }
     }
   };
   // ENDS
@@ -258,6 +346,7 @@ export default function App() {
         uri: recordedURI, 
         duration: time,
         timestamp: new Date().toISOString(),
+        userId: userInformation.uid
       };
   
       // Save the recording to AsyncStorage
@@ -321,7 +410,7 @@ export default function App() {
   
   
 
-  // Format time
+  // FORMAT TIME
   const formatTime = (seconds) => {
     const hrs = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
@@ -334,73 +423,80 @@ export default function App() {
   useEffect(() => {
     const loadRecordings = async () => {
       try {
-        const keys = await AsyncStorage.getAllKeys();
-        const recordingsData = await AsyncStorage.multiGet(keys);
-  
-        // Parse and filter recordings, ensuring `uri` field is included
-        const recordings = recordingsData
-          .map(([key, value]) => {
-            if (key.startsWith('recording_')) { 
-              const recording = JSON.parse(value);
-              return { ...recording, key }; 
-            }
-            return null;
-          })
-          .filter(recording => recording !== null); 
-  
-        setRecordings(recordings);
+        if (userInformation) {
+          const userId = userInformation.uid; 
+
+          const keys = await AsyncStorage.getAllKeys();
+          const recordingsData = await AsyncStorage.multiGet(keys);
+
+          const recordings = recordingsData
+            .map(([key, value]) => {
+              if (key.startsWith('recording_')) {
+                const recording = JSON.parse(value);
+                if (recording.userId === userId) {  
+                  return { ...recording, key };
+                }
+              }
+              return null;
+            })
+            .filter(recording => recording !== null);
+
+          setRecordings(recordings);
+        }
       } catch (error) {
         console.error('Failed to load recordings', error);
-       
-        Toast.show({
-          type: 'error',
-          text1: 'Error',
-          text2: 'Failed to load recordings.',
-          position: 'bottom',
-        });
+
+        ToastAndroid.showWithGravity(
+          'Failed to load recordings.',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
       }
     };
-  
+
     loadRecordings();
-  }, [recordings]);
+  }, [userInformation]); 
 
   // REFRESH
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      // Logic to reload recordings (e.g., fetching from AsyncStorage or API)
-      const keys = await AsyncStorage.getAllKeys();
-      const storedRecordings = await AsyncStorage.multiGet(keys);
-      const updatedRecordings = storedRecordings.map(([key, value]) => ({
-        key,
-        ...JSON.parse(value),
-      }));
+      if (userInformation) {
+        const userId = userInformation.uid;
+        const keys = await AsyncStorage.getAllKeys();
+        const storedRecordings = await AsyncStorage.multiGet(keys);
+        
+        // Filter and update recordings based on userId
+        const updatedRecordings = storedRecordings
+          .map(([key, value]) => {
+            const recording = JSON.parse(value);
+            if (recording.userId === userId) {  
+              return { key, ...recording };
+            }
+            return null;
+          })
+          .filter(recording => recording !== null);
 
-      setRecordings(updatedRecordings);
-      Toast.show({
-        type: 'success',
-        text1: 'Refreshed',
-        text2: 'Recordings list updated.',
-        position: 'bottom',
-      });
+        setRecordings(updatedRecordings);
+        ToastAndroid.showWithGravity(
+          'Recordings list updated.',
+          ToastAndroid.SHORT,
+          ToastAndroid.BOTTOM
+        );
+      }
     } catch (error) {
       console.error('Failed to refresh recordings:', error);
-      Toast.show({
-        type: 'error',
-        text1: 'Error',
-        text2: 'Failed to refresh recordings.',
-        position: 'bottom',
-      });
+      ToastAndroid.showWithGravity(
+        'Failed to refresh recordings.',
+        ToastAndroid.SHORT,
+        ToastAndroid.BOTTOM
+      );
     } finally {
       setRefreshing(false);
     }
   };
   
   // ENDS
-
-    
-    const saved = recordings;
-    // console.log('My recordings:', saved);
 
 
   // USE EFFECT TO AUTOMATICALLY CHANGE VIEW AFTER 2 SECONDS
@@ -480,6 +576,7 @@ export default function App() {
             setIsProfile={setIsProfile}
             settings={settings}
             setSettings={setSettings}
+            userInformation={userInformation}
           />
         ) : view === 'profile' ? (
           <Account
@@ -489,6 +586,9 @@ export default function App() {
           toggleButton={toggleButton}
           isToggled={isToggled}
           logout={logout}
+          userInformation={userInformation}
+          sendPasswordReset={sendPasswordReset}
+      
 
           />
 
@@ -518,6 +618,8 @@ export default function App() {
             fullNames={fullNames}
             setFullNames={setFullNames}
             register={register}
+            confirmPassword={confirmPassword}
+            setConfirmPassword={setConfirmPassword}
             
             />
         ) : (

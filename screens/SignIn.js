@@ -3,7 +3,6 @@ import
     View,
     StyleSheet,
     Text,
-    Pressable,
     Image,
     TextInput,
     TouchableOpacity
@@ -14,7 +13,19 @@ from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 
 
-export default function SignIn({changeView, showPassword, setShowPassword, login}){
+export default function SignIn({
+    changeView, 
+    showPassword, 
+    setShowPassword, 
+    login, 
+    email, 
+    password, 
+    setEmail, 
+    setPassword, 
+    sendPasswordReset, 
+}){
+
+    const myEmail = 'okpoco15@gmail'
 
 
     return(
@@ -46,21 +57,23 @@ export default function SignIn({changeView, showPassword, setShowPassword, login
 
                         {/* EMAIL */}
                         <View style={styles.signInputContainer}>
-                            <Text style={styles.signText}>Email</Text>
                             <TextInput
                             style={styles.signInput}
                             placeholder="Enter your email"
+                            value={email}
+                            onChangeText={setEmail}
                             />
                         </View>
                         {/* ENDS */}
 
                         {/* PASSWORD */}
                         <View style={[styles.signInputContainer, {marginTop:25}]}>
-                            <Text style={styles.signText}>Password</Text>
                             <TextInput
                             style={styles.signInput}
                             placeholder="Enter your password"
                             secureTextEntry={!showPassword}
+                            value={password}
+                            onChangeText={setPassword}
                             />
 
                             <TouchableOpacity
@@ -82,7 +95,7 @@ export default function SignIn({changeView, showPassword, setShowPassword, login
                             <Text style={styles.signButtonText}>Login</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.signForgot}>
+                        <TouchableOpacity style={styles.signForgot} onPress={()=> sendPasswordReset(myEmail)}>
                             <Text style={styles.signForgotText}>Forgot Password?</Text>
                         </TouchableOpacity>
                         {/* ENDS */}
