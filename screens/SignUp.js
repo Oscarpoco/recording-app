@@ -8,27 +8,65 @@ import {
     Image,
     Alert,
 } from 'react-native';
+
+import Toast from 'react-native-toast-message';
+
+// ICONS
 import Feather from 'react-native-vector-icons/Feather';
 
-export default function SignUp({ changeView, showPassword, setShowPassword }) {
-    const [email, setEmail] = useState('');
-    const [fullNames, setFullNames] = useState('');
-    const [password, setPassword] = useState('');
+export default function SignUp(
+    { 
+        changeView, 
+        showPassword, 
+        setShowPassword,
+        password,
+        setPassword,
+        fullNames,
+        email,
+        setEmail, 
+        register
+    }) {
+    
     const [confirmPassword, setConfirmPassword] = useState('');
 
     const handleRegister = () => {
-        if (!email || !fullNames || !password || !confirmPassword) {
-            return Alert.alert('Error', 'All fields are required');
+        if (!email || !password || !confirmPassword) {
+            return  Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: "All fields are required",
+                        position: 'bottom',
+                        duration: 3000
+                    });
+            
         }
         if (!/\S+@\S+\.\S+/.test(email)) {
-            return Alert.alert('Error', 'Please enter a valid email address');
+            return Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: "Please enter a valid email address",
+                        position: 'bottom',
+                        duration: 3000
+                    });
         }
         if (password !== confirmPassword) {
-            return Alert.alert('Error', 'Passwords do not match');
+            return Toast.show({
+                        type: 'error',
+                        text1: 'Error',
+                        text2: "Passwords do not match",
+                        position: 'bottom',
+                        duration: 3000
+                    });
         }
 
-        // Proceed with API integration
-        Alert.alert('Success', 'Account created successfully!');
+        register({email, password})
+        Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: "Account created successfully!",
+            position: 'bottom',
+            duration: 3000
+        });
         changeView('play');
     };
 
@@ -65,15 +103,6 @@ export default function SignUp({ changeView, showPassword, setShowPassword }) {
                             />
                         </View>
 
-                        <View style={[styles.signInputContainer, { marginTop: 20 }]}>
-                            <Text style={styles.signText}>Full Names</Text>
-                            <TextInput
-                                style={styles.signInput}
-                                placeholder="Enter your full names"
-                                value={fullNames}
-                                onChangeText={setFullNames}
-                            />
-                        </View>
 
                         <View style={[styles.signInputContainer, { marginTop: 25 }]}>
                             <Text style={styles.signText}>Password</Text>

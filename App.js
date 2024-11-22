@@ -20,6 +20,10 @@ import { useState, useEffect, useRef } from 'react';
 
 // ENDS
 
+// FIREBASE
+import { auth } from './firebase/config.js';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+
 // EXPO
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio } from 'expo-av';
@@ -30,7 +34,7 @@ export default function App() {
 
   const [recordings, setRecordings] = useState([]);
   const [view, setView] = useState('splash');
-  const opacity = useRef(new Animated.Value(1)).current;
+
 
   // RECORDING STATE
   const [title, setTitle] = useState('');
@@ -45,6 +49,124 @@ export default function App() {
   const [isProfile, setIsProfile] = useState(false);
   const [isToggled, setIsToggled] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState('');
+  const [fullNames, setFullNames] = useState('');
+  const [password, setPassword] = useState('');
+
+
+  // FIREBASE REGISTER AND LOGIN
+
+  // Check for authenticated user
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        console.log("User logged in:", user);
+        setView("play"); 
+      } else {
+        console.log("No user logged in");
+        setView("sign"); 
+      }
+    });
+    return unsubscribe; 
+  }, []);
+
+
+  // Function to handle user registration
+  const register = async () => {
+    try {
+      if (!email || !password) {
+        
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: "Email and password are required!",
+          position: 'bottom',
+        });
+        return;
+      }
+
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: "Registration complete! You can now log in.",
+        position: 'bottom',
+      });
+      
+      setView("play");
+    } catch (error) {
+      console.error("Registration Error:", error.message);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: "Registration Failed",
+        position: 'bottom',
+      });
+    
+    }
+  };
+
+  // Function to handle user login
+  const login = async () => {
+    try {
+      if (!email || !password) {
+        
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: "Email and password are required!",
+          position: 'bottom',
+        });
+
+        return;
+      }
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: "Welcome back!",
+        position: 'bottom',
+      });
+
+      setView("play");
+    } catch (error) {
+      console.error("Login Error:", error.message);
+     
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: "Login Failed",
+        position: 'bottom',
+      });
+    }
+  };
+
+  // Function to log out
+  const logout = async () => {
+    try {
+      await auth.signOut();
+      
+      Toast.show({
+        type: 'success',
+        text1: 'Logged out',
+        text2: "You have been logged out.",
+        position: 'bottom',
+      });
+      setView("sign");
+    } catch (error) {
+      console.error("Logout Error:", error.message);
+      
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: "Logout Failed",
+        position: 'bottom',
+      });
+    }
+  };
+  // ENDS
 
   // TOGGLE BUTTON
   const toggleButton = () => {
@@ -366,6 +488,7 @@ export default function App() {
           setSettings={setSettings}
           toggleButton={toggleButton}
           isToggled={isToggled}
+          logout={logout}
 
           />
 
@@ -375,7 +498,12 @@ export default function App() {
           changeView={changeView}
           showPassword={showPassword}
           setShowPassword={setShowPassword}
-
+          email={email}
+          setEmail={setEmail}
+          password={password}
+          setPassword={setPassword}
+          login={login}
+          
           />
         ) : view === 'signUp' ? (
             <SignUp
@@ -383,6 +511,13 @@ export default function App() {
             changeView={changeView}
             showPassword={showPassword}
             setShowPassword={setShowPassword}
+            email={email}
+            setEmail={setEmail}
+            password={password}
+            setPassword={setPassword}
+            fullNames={fullNames}
+            setFullNames={setFullNames}
+            register={register}
             
             />
         ) : (

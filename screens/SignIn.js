@@ -14,7 +14,7 @@ from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 
 
-export default function SignIn({changeView, showPassword, setShowPassword}){
+export default function SignIn({changeView, showPassword, setShowPassword, login}){
 
 
     return(
@@ -78,7 +78,7 @@ export default function SignIn({changeView, showPassword, setShowPassword}){
                         {/* ENDS */}
 
                         {/* BUTTON */}
-                        <TouchableOpacity style={styles.signButton} onPress={()=> changeView('play')}>
+                        <TouchableOpacity style={styles.signButton} onPress={()=> login()}>
                             <Text style={styles.signButtonText}>Login</Text>
                         </TouchableOpacity>
 

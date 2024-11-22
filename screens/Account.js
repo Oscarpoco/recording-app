@@ -14,7 +14,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 
-export default function Account({changeView, setSettings, isToggled, toggleButton}){
+export default function Account({changeView, setSettings, isToggled, toggleButton, logout}){
 
 
     return(
@@ -164,7 +164,7 @@ export default function Account({changeView, setSettings, isToggled, toggleButto
                             <Text style={styles.accountChildContentItemButtonText}>Feedback</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> changeView('sign')}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> logout()}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <MaterialCommunityIcons name="logout" size={15} color="#333" />
                             </View>
