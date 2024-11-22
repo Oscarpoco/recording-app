@@ -14,7 +14,7 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 
-export default function Account({changeView}){
+export default function Account({changeView, setSettings, isToggled, toggleButton}){
 
 
     return(
@@ -38,15 +38,26 @@ export default function Account({changeView}){
                         source={require('../assets/cover.jpg')} 
                         style={styles.BackgroundCover}
                         />
+
+                        <TouchableOpacity style={styles.accountChildBackgroundCoverButton}>
+                            <MaterialCommunityIcons name="camera" size={25} color="#000" />
+                        </TouchableOpacity>
+
                 </View>
                 {/* ENDS */}
 
                 {/* PROFILE PICTURE */}
                 <View style={styles.accountChildProfilePicture}>
+
                     <Image 
                     source={require('../assets/user.jpg')} 
                     style={styles.BackgroundProfile}
                     />
+
+                    <TouchableOpacity style={styles.accountChildProfilePictureButton}>
+                        <MaterialCommunityIcons name="camera" size={25} color="#000" />
+                    </TouchableOpacity>
+
                 </View>
                 {/* ENDS */}
             </View>
@@ -82,7 +93,7 @@ export default function Account({changeView}){
 
                     {/* SECOND SECTION */}
 
-                    <View style={styles.accountChildContentItem}>
+                    <View style={[styles.accountChildContentItem, {position: 'relative'}]}>
 
                         <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
                             <View style={styles.accountChildContentItemButtonIcon}>
@@ -90,6 +101,45 @@ export default function Account({changeView}){
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Backup</Text>
                         </TouchableOpacity>
+
+                        <View style={styles.accountToggle}>
+                            <TouchableOpacity
+                                onPress={toggleButton}
+                                style={[styles.toggleButton, isToggled ? styles.active : styles.inactive]}
+                            >
+                                    <Text style={styles.buttonText}>{isToggled ? 
+                                        'ON'
+                                        : 
+                                        'OFF'}
+                                    </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                    </View>
+
+                    {/* SECOND SECTION */}
+
+                    <View style={[styles.accountChildContentItem, {position: 'relative'}]}>
+
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
+                            <View style={styles.accountChildContentItemButtonIcon}>
+                                <MaterialIcons name="sync" size={15} color="#333" />
+                            </View>
+                            <Text style={styles.accountChildContentItemButtonText}>Sync</Text>
+                        </TouchableOpacity>
+
+                        <View style={styles.accountToggle}>
+                            <TouchableOpacity
+                                onPress={toggleButton}
+                                style={[styles.toggleButton, isToggled ? styles.active : styles.inactive]}
+                            >
+                                    <Text style={styles.buttonText}>{isToggled ? 
+                                        'ON'
+                                        : 
+                                        'OFF'}
+                                    </Text>
+                            </TouchableOpacity>
+                        </View>
 
                     </View>
 
@@ -102,14 +152,19 @@ export default function Account({changeView}){
                             <Text style={styles.accountChildContentItemButtonText}>Security & privacy</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap} 
+                        onPress={()=> {
+                            setSettings(true);
+                            changeView('play');
+                        }
+                        }>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <MaterialIcons name="feedback" size={15} color="#333" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Feedback</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> changeView('signUp')}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> changeView('sign')}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <MaterialCommunityIcons name="logout" size={15} color="#333" />
                             </View>
@@ -153,7 +208,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         position: 'absolute',
         top: 30,
-        // backgroundColor: '#000',
         zIndex: 11
 
 
@@ -202,6 +256,36 @@ const styles = StyleSheet.create({
         borderRadius: 100
     },
 
+    accountChildProfilePictureButton:
+    {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        width: 40,
+        height: 40,
+        backgroundColor: 'rgba(255, 255, 255, .8)',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 50,
+        elevation: 10
+    },
+
+    accountChildBackgroundCoverButton:
+    {
+        position: 'absolute',
+        bottom:50,
+        right: 30,
+        width: 40,
+        height: 40,
+        backgroundColor: 'rgba(255, 255, 255, .9)',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 50,
+        elevation: 10
+    },
+
     // THIRD
     thirdAccountChild:
     {
@@ -212,7 +296,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         zIndex: 9,
-        borderRadius: 40,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
     },
 
     thirdAccountChildContent:
@@ -220,7 +305,8 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: 'rgba(255, 255, 255, .6)',
-        borderRadius: 40,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
@@ -235,10 +321,9 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         flexDirection: 'column',
         gap: 1,
-        marginBottom: 40
+        marginBottom: 7
     },
 
-    
     accountText:
     {
         color: '#000',
@@ -292,7 +377,44 @@ const styles = StyleSheet.create({
         color: '#333',
         fontSize: 16,
         fontWeight: 900
-    }
+    },
 
+    toggleButton: {
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      active: {
+        backgroundColor: 'green',
+        width: 35,
+        height: 18,
+        alignSelf: 'flex-start'
+      },
 
-})
+      inactive: {
+        backgroundColor: 'red',
+        width: 35,
+        height: 18,
+        alignSelf: 'flex-end'
+      },
+
+      buttonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        fontSize: 12,
+      },
+
+      accountToggle:
+      {
+        width: 45,
+        backgroundColor: 'rgba(0, 0, 0, .2)',
+        borderRadius: 40,
+        position: 'absolute',
+        right: 10,
+        padding: 1,
+        borderWidth: 2,
+        borderColor: 'rgba(0, 0, 0, .2)',
+        elevation: 1
+      }
+
+    })

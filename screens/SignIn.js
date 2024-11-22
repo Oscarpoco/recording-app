@@ -14,7 +14,7 @@ from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 
 
-export default function SignIn({changeView}){
+export default function SignIn({changeView, showPassword, setShowPassword}){
 
 
     return(
@@ -60,7 +60,20 @@ export default function SignIn({changeView}){
                             <TextInput
                             style={styles.signInput}
                             placeholder="Enter your password"
+                            secureTextEntry={!showPassword}
                             />
+
+                            <TouchableOpacity
+                                onPress={() => setShowPassword(!showPassword)}
+                                style={styles.eyeIcon}
+                            >
+                                <Feather
+                                    name={showPassword ? 'eye' : 'eye-off'}
+                                    size={20}
+                                    color="gray"
+                                />
+                            </TouchableOpacity>
+
                         </View>
                         {/* ENDS */}
 
@@ -144,7 +157,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, .1)',
-        borderRadius: 100,
+        borderRadius: 150,
         marginTop: 50
     },
 
@@ -167,8 +180,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         backgroundColor: 'rgba(255, 255, 255, .8)',
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         paddingTop: 20,
         gap: 50
     },
@@ -187,6 +200,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
         gap: 5,
+        position: 'relative'
     },
 
     signText:
@@ -204,7 +218,9 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 50,
         borderRadius: 10,
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
+        fontSize: 14,
+        fontWeight: 900,
     },
 
     signButton:
@@ -255,6 +271,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         gap: 10,
+    },
+
+    eyeIcon: {
+        bottom: 15,
+        right: 15,
+        position: 'absolute'
+
     },
 
 

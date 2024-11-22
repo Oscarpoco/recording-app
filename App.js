@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Animated, Alert, View,SafeAreaView } from 'react-native';
+import { StyleSheet, Animated, Alert, View,SafeAreaView, Dimensions } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 // CUSTOM SCREENS
@@ -41,7 +41,15 @@ export default function App() {
   const [recordedURI, setRecordedURI] = useState(null); 
   const [refreshing, setRefreshing] = useState(false);
   const [isEditting, setIsEditting] = useState(false);
+  const [settings, setSettings] = useState(false);
   const [isProfile, setIsProfile] = useState(false);
+  const [isToggled, setIsToggled] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // TOGGLE BUTTON
+  const toggleButton = () => {
+    setIsToggled(!isToggled);
+  };
 
 
   // ENDS
@@ -287,20 +295,22 @@ export default function App() {
 
   // FUNCTION TO MANIPULATE THE VIEW STATE 
 
-  const changeView = (view) => {
- 
+  const translateX = useRef(new Animated.Value(0)).current;
 
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 300,
+  const changeView = (view) => {
+   
+    Animated.timing(translateX, {
+      toValue: -1, 
+      duration: 200,
       useNativeDriver: true,
     }).start(() => {
-
-
+    
       setView(view);
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 300,
+  
+      translateX.setValue(Dimensions.get('window').width); 
+      Animated.timing(translateX, {
+        toValue: 0, 
+        duration: 200,
         useNativeDriver: true,
       }).start();
     });
@@ -311,7 +321,7 @@ export default function App() {
   return (
 
     <SafeAreaView style={styles.container}>
-      <Animated.View style={[styles.container, { opacity }]}>
+      <Animated.View style={[styles.container, { transform: [{ translateX }] }]}>
 
         {/* RENDERING SCREENS */}
 
@@ -346,11 +356,16 @@ export default function App() {
             isEditting={isEditting}
             setIsEditting={setIsEditting}
             setIsProfile={setIsProfile}
+            settings={settings}
+            setSettings={setSettings}
           />
         ) : view === 'profile' ? (
           <Account
 
           changeView={changeView}
+          setSettings={setSettings}
+          toggleButton={toggleButton}
+          isToggled={isToggled}
 
           />
 
@@ -358,12 +373,16 @@ export default function App() {
           <SignIn
           
           changeView={changeView}
+          showPassword={showPassword}
+          setShowPassword={setShowPassword}
 
           />
         ) : view === 'signUp' ? (
             <SignUp
             
             changeView={changeView}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
             
             />
         ) : (

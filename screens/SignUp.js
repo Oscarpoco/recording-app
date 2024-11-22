@@ -1,113 +1,151 @@
-import 
-{
+import React, { useState } from 'react';
+import {
     View,
     StyleSheet,
     Text,
-    Pressable,
-    Image,
     TextInput,
-    TouchableOpacity
-}
-from 'react-native';
-
-// ICONS
+    TouchableOpacity,
+    Image,
+    Alert,
+} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 
+export default function SignUp({ changeView, showPassword, setShowPassword }) {
+    const [email, setEmail] = useState('');
+    const [fullNames, setFullNames] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
-export default function SignUp({changeView}){
+    const handleRegister = () => {
+        if (!email || !fullNames || !password || !confirmPassword) {
+            return Alert.alert('Error', 'All fields are required');
+        }
+        if (!/\S+@\S+\.\S+/.test(email)) {
+            return Alert.alert('Error', 'Please enter a valid email address');
+        }
+        if (password !== confirmPassword) {
+            return Alert.alert('Error', 'Passwords do not match');
+        }
 
+        // Proceed with API integration
+        Alert.alert('Success', 'Account created successfully!');
+        changeView('play');
+    };
 
-    return(
+    return (
         <View style={styles.signParent}>
-            {/* BACKGROUND */}
-                <Image
-                source={require('../assets/splashScreen.jpg')} 
+            {/* Background */}
+            <Image
+                source={require('../assets/splashScreen.jpg')}
                 style={styles.Backgroundimage}
-                />
-            {/* ENDS */}
+            />
 
             <View style={[styles.signChild, styles.blurOverlay]}>
-
-                {/* LOGO */}
+                {/* Logo */}
                 <View style={styles.signLogo}>
                     <Image
-                    source={require('../assets/download.jpg')} 
-                    style={styles.image}
+                        source={require('../assets/download.jpg')}
+                        style={styles.image}
                     />
                 </View>
-                {/* ENDS */}
 
-                {/* FORM WRAPPER*/}
+                {/* Form */}
                 <View style={styles.signForm}>
                     <Text style={styles.signTextTitle}>Get started</Text>
 
-                    {/* FORM */}
+                    {/* Inputs */}
                     <View>
-
-                        {/* EMAIL */}
                         <View style={styles.signInputContainer}>
                             <Text style={styles.signText}>Email</Text>
                             <TextInput
-                            style={styles.signInput}
-                            placeholder="Enter your email"
+                                style={styles.signInput}
+                                placeholder="Enter your email"
+                                value={email}
+                                onChangeText={setEmail}
                             />
                         </View>
-                        {/* ENDS */}
 
-                        {/* FULLNAMES */}
-                        <View style={[styles.signInputContainer, {marginTop: 20,}]}>
-                            <Text style={styles.signText}>Fullnames</Text>
+                        <View style={[styles.signInputContainer, { marginTop: 20 }]}>
+                            <Text style={styles.signText}>Full Names</Text>
                             <TextInput
-                            style={styles.signInput}
-                            placeholder="Enter your fullnames"
+                                style={styles.signInput}
+                                placeholder="Enter your full names"
+                                value={fullNames}
+                                onChangeText={setFullNames}
                             />
                         </View>
-                        {/* ENDS */}
 
-                        {/* PASSWORD */}
-                        <View style={[styles.signInputContainer, {marginTop:25}]}>
+                        <View style={[styles.signInputContainer, { marginTop: 25 }]}>
                             <Text style={styles.signText}>Password</Text>
                             <TextInput
-                            style={styles.signInput}
-                            placeholder="Enter your password"
+                                style={styles.signInput}
+                                placeholder="Enter your password"
+                                secureTextEntry
+                                value={password}
+                                onChangeText={setPassword}
                             />
+
+                            <TouchableOpacity
+                                onPress={() => setShowPassword(!showPassword)}
+                                style={styles.eyeIcon}
+                            >
+                                <Feather
+                                    name={showPassword ? 'eye' : 'eye-off'}
+                                    size={20}
+                                    color="gray"
+                                />
+                            </TouchableOpacity>
                         </View>
 
-                        <View style={[styles.signInputContainer, {marginTop:25}]}>
+                        <View style={[styles.signInputContainer, { marginTop: 25 }]}>
                             <Text style={styles.signText}>Confirm Password</Text>
                             <TextInput
-                            style={styles.signInput}
-                            placeholder="Re-enter your password"
+                                style={styles.signInput}
+                                placeholder="Re-enter your password"
+                                secureTextEntry
+                                value={confirmPassword}
+                                onChangeText={setConfirmPassword}
                             />
-                        </View>
-                        {/* ENDS */}
 
-                        {/* BUTTON */}
-                        <TouchableOpacity style={styles.signButton} onPress={()=> changeView('play')}>
+                            <TouchableOpacity
+                                onPress={() => setShowPassword(!showPassword)}
+                                style={styles.eyeIcon}
+                            >
+                                <Feather
+                                    name={showPassword ? 'eye' : 'eye-off'}
+                                    size={20}
+                                    color="gray"
+                                />
+                            </TouchableOpacity>
+                        </View>
+
+                        {/* Register Button */}
+                        <TouchableOpacity style={styles.signButton} onPress={handleRegister}>
                             <Text style={styles.signButtonText}>Register</Text>
                         </TouchableOpacity>
-
-                        {/* ENDS */}
                     </View>
-                    {/* ENDS */}
 
-                    {/* FORGOT PASSWORD */}
+                    {/* Sign In Option */}
                     <View style={styles.signUpParent}>
-
-                        <TouchableOpacity style={[styles.signUp, {marginBottom: 20,}]} onPress={()=> changeView('sign')}>
-                            <Text style={[styles.signForgotText, {fontSize: 15}]}>Sign In</Text>
-                            <Feather name="arrow-right-circle" size={30} color="rgba(0, 0, 0, .5)" />
+                        <TouchableOpacity
+                            style={[styles.signUp, { marginBottom: 20 }]}
+                            onPress={() => changeView('sign')}>
+                            <Text style={[styles.signForgotText, { fontSize: 15 }]}>
+                                Sign In
+                            </Text>
+                            <Feather
+                                name="arrow-right-circle"
+                                size={30}
+                                color="rgba(0, 0, 0, .5)"
+                            />
                         </TouchableOpacity>
-
                     </View>
-                    {/* ENDS */}
                 </View>
-                {/* ENDS */}
             </View>
-            
         </View>
-    )
+    );
 }
+
 
 const styles = StyleSheet.create({
 
@@ -182,8 +220,8 @@ const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         backgroundColor: 'rgba(255, 255, 255, .8)',
-        borderTopLeftRadius: 40,
-        borderTopRightRadius: 40,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         gap: 30
     },
 
@@ -202,6 +240,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         alignItems: 'flex-start',
         gap: 5,
+        position: 'relative'
     },
 
     signText:
@@ -271,5 +310,12 @@ const styles = StyleSheet.create({
         gap: 10,
     },
 
+    eyeIcon: 
+    {
+        bottom: 15,
+        right: 15,
+        position: 'absolute'
+
+    },
 
 })

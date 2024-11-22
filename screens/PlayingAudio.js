@@ -37,7 +37,7 @@ import { format } from 'date-fns';
 
 
 
-export default function Play({ changeView, recordings, setRecordings, onRefresh, refreshing, isEditting, setIsEditting, setIsProfile }) {
+export default function Play({ changeView, recordings, setRecordings, onRefresh, refreshing, isEditting, setIsEditting, setIsProfile, settings, setSettings }) {
 
   // STATES
   const [sound, setSound] = useState(null);
@@ -45,7 +45,6 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
   const [currentlyPlaying, setCurrentlyPlaying] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [settings, setSettings] = useState(false);
 
   // FORM
   const [input1, setInput1] = useState('');
@@ -405,16 +404,6 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
       ) : (
 
         <View style={styles.recordButtonParent}>
-          <TouchableOpacity 
-            onPress={() => setSettings(true)}
-            style={styles.navSettings}
-          >
-            <MaterialIcons 
-              name="settings" 
-              size={40} 
-              color="#FFF" 
-            />
-          </TouchableOpacity>
           
           <TouchableOpacity 
             onPress={() => changeView('record')}
@@ -436,7 +425,12 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
       (
         <View style={styles.settingsParent}>
             <View style={styles.returnButtonIcon}>
-              <TouchableOpacity onPress={() =>setSettings(false)}>
+              <TouchableOpacity 
+              onPress={() =>{
+                setSettings(false);
+                changeView('profile');
+              }
+              }>
                 <MaterialCommunityIcons name="keyboard-backspace" size={40} color="#fff" />
               </TouchableOpacity>
             </View>
@@ -605,7 +599,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 1)',
     alignItems: 'center',
     justifyContent: 'space-between',
-    zIndex: 1
+    zIndex: 100
   },
 
   settingsChild:
