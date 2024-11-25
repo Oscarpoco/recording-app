@@ -25,7 +25,7 @@ export default function SignIn({
     sendPasswordReset, 
 }){
 
-    const myEmail = 'okpoco15@gmail'
+    const myEmail = 'okpoco15@gmail';
 
 
     return(
@@ -165,45 +165,49 @@ const styles = StyleSheet.create({
 
     signLogo:
     {
-        width: 200,
-        height: 200,
+        width: 350,
+        height: 350,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, .1)',
-        borderRadius: 150,
-        marginTop: 50
+        borderRadius: 200,
+        marginTop: 20,
+      
+
     },
 
     image:
     {
-        width: 150,
-        height: 150,
+        width: 200,
+        height: 200,
         justifyContent: 'center',
         resizeMode: 'cover',
-        borderRadius: 100
+        borderRadius: 150,
+        // marginBottom: 70,
     },
 
     signForm:
     {
         width: '100%',
-        height: '65%',
+        height: '80%',
         flexDirection: 'column',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
         bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, .8)',
+        backgroundColor: 'rgba(255, 255, 255, 1)',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         paddingTop: 20,
-        gap: 50
+        gap: 50,
+        zIndex: 1
     },
 
     signTextTitle:
     {
-        fontSize: 24,
+        fontSize: 30,
         color: 'rgba(0, 0, 0, 5)',
-        fontWeight: 900
+        fontWeight: 900,
     },
 
     signInputContainer:

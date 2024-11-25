@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { initializeAuth, getAuth, getReactNativePersistence } from "firebase/auth";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getFirestore } from "firebase/firestore";
 
 // Firebase configuration
 const firebaseConfig = {
@@ -9,15 +10,20 @@ const firebaseConfig = {
   projectId: "recording-application",
   storageBucket: "recording-application.firebasestorage.app",
   messagingSenderId: "646181256821",
-  appId: "1:646181256821:web:136d1d097dda4f4d18023c",
+  appId: "1:646181256821:web:136d1d097dda4f4d18023c"
 };
 
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 
-// Use `getAuth` to avoid re-initializing Firebase Auth
-export const auth =
-  getAuth(app) ||
+// Initialize Auth with persistence
+export const auth = getAuth(app) || 
   initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage),
+    persistence: getReactNativePersistence(AsyncStorage)
   });
+
+ export const firestore = getFirestore(app);
+
+
+// Export the app instance if needed elsewhere
+export default app;

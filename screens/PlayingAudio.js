@@ -46,7 +46,6 @@ export default function Play(
     refreshing, 
     isEditting, 
     setIsEditting, 
-    setIsProfile, 
     settings, 
     setSettings,
     userInformation 
@@ -290,12 +289,9 @@ export default function Play(
         <View style={styles.searchContainer}>
 
           <View style={styles.AccountHeader}>
-              <Text style={styles.AccountText}>Welcome back {userInformation.email || User}</Text>
-              <TouchableOpacity onPress={()=> changeView('profile')}>
-                <Image
-                  source={require('../assets/user.jpg')} 
-                  style={styles.image}
-                />
+              <Text style={styles.AccountText}>Welcome back</Text>
+              <TouchableOpacity onPress={()=> changeView('profile')} style={styles.menu}>
+                  <Entypo name="menu" size={25} color="rgba(255, 255, 255, .5)" />
               </TouchableOpacity>
           </View>
 
@@ -751,11 +747,14 @@ const styles = StyleSheet.create({
     paddingTop: 25,
   },
 
-  image:
+  menu:
   {
     width: 40,
     height: 40,
-    borderRadius: 50
+    borderRadius: 50,
+    backgroundColor: 'rgba(255, 255, 255, .1)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   AccountText:
@@ -774,8 +773,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderBottomColor: 'rgba(255, 255, 255, .2)',
+    borderWidth: .5,
+    borderBottomColor: 'rgba(255, 255, 255, .1)',
     paddingHorizontal: 7,
     marginTop: 15,
 

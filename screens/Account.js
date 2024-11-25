@@ -8,16 +8,84 @@ import
 }
 from 'react-native';
 
+import { useState, useEffect  } from 'react';
+
 // ICONS
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import UserDetailsScreen from './UserDetailsScreen';
+
+import { auth } from "../firebase/config.js";
 
 
-export default function Account({changeView, setSettings, isToggled, toggleButton, logout, userInformation, sendPasswordReset, }){
 
+export default function Account(
+    {
+        changeView, 
+        setSettings, 
+        isToggled, 
+        toggleButton, 
+        logout, 
+        userInformation, 
+        sendPasswordReset,
+        setIsProfile, 
+        isProfile,
+        updateUserDetails,
+        loadSavedPhotos,
+        handleProfilePhotoUpdate,
+        handleCoverPhotoUpdate,
+        userDetails,
+    }){
 
-    const userEmail = userInformation.email || '';
+        const [profileImage, setProfileImage] = useState(null);
+        const [coverImage, setCoverImage] = useState(null);
+        const [isLoading, setIsLoading] = useState(true);
+        const userEmail = userInformation.email || '';
+
+        useEffect(() => {
+            const loadPhotos = async () => {
+            try {
+                const savedPhotos = await loadSavedPhotos(userInformation);
+                
+                if (savedPhotos.profilePhoto) {
+                setProfileImage({ uri: savedPhotos.profilePhoto });
+                }
+                
+                if (savedPhotos.coverPhoto) {
+                setCoverImage({ uri: savedPhotos.coverPhoto });
+                }
+            } catch (error) {
+                console.error("Error loading photos:", error);
+            } finally {
+                setIsLoading(false);
+            }
+            };
+
+            loadPhotos();
+        }, [userInformation]);
+
+        const onProfilePhotoUpdate = async () => {
+            try {
+            const photoURL = await handleProfilePhotoUpdate(userInformation);
+            if (photoURL) {
+                setProfileImage({ uri: photoURL });
+            }
+            } catch (error) {
+            console.error("Error in onProfilePhotoUpdate:", error);
+            }
+        };
+
+        const onCoverPhotoUpdate = async () => {
+            try {
+            const coverURL = await handleCoverPhotoUpdate(userInformation);
+            if (coverURL) {
+                setCoverImage({ uri: coverURL });
+            }
+            } catch (error) {
+            console.error("Error in onCoverPhotoUpdate:", error);
+            }
+        };
 
 
     return(
@@ -38,11 +106,11 @@ export default function Account({changeView, setSettings, isToggled, toggleButto
                 {/* COVER */}
                 <View syle={styles.accountChildCover}>
                         <Image 
-                        source={require('../assets/cover.jpg')} 
+                         source={coverImage || require("../assets/cover.jpg")}  
                         style={styles.BackgroundCover}
                         />
 
-                        <TouchableOpacity style={styles.accountChildBackgroundCoverButton}>
+                        <TouchableOpacity style={styles.accountChildBackgroundCoverButton} onPress={()=> onCoverPhotoUpdate()}>
                             <MaterialCommunityIcons name="camera" size={25} color="#000" />
                         </TouchableOpacity>
 
@@ -53,11 +121,11 @@ export default function Account({changeView, setSettings, isToggled, toggleButto
                 <View style={styles.accountChildProfilePicture}>
 
                     <Image 
-                    source={require('../assets/user.jpg')} 
+                     source={profileImage || require("../assets/user.jpg")} 
                     style={styles.BackgroundProfile}
                     />
 
-                    <TouchableOpacity style={styles.accountChildProfilePictureButton}>
+                    <TouchableOpacity style={styles.accountChildProfilePictureButton} onPress={()=> onProfilePhotoUpdate()}>
                         <MaterialCommunityIcons name="camera" size={25} color="#000" />
                     </TouchableOpacity>
 
@@ -70,15 +138,15 @@ export default function Account({changeView, setSettings, isToggled, toggleButto
                 <View style={styles.thirdAccountChildContent}>
 
                     <View style={styles.accountChildContentAbout}>
-                        <Text style={styles.accountText}>{userInformation.email || User}</Text>
-                        <Text style={styles.accountTextBio}>I am a Software developer</Text>
+                        <Text style={styles.accountText}>{userInformation.displayName || 'User'}</Text>
+                        <Text style={styles.accountTextBio}>{userDetails.bio || 'User'}</Text>
                     </View>
 
                     {/* FIRST SECTION */}
                     
                     <View style={styles.accountChildContentItem}>
 
-                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
+                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> setIsProfile(true)}>
                             <View style={styles.accountChildContentItemButtonIcon}>
                                 <AntDesign name="profile" size={15} color="#333" />
                             </View>
@@ -180,6 +248,28 @@ export default function Account({changeView, setSettings, isToggled, toggleButto
             </View>
             {/* ENDS */}
 
+            {/* EDIT PROFILE */}
+            {isProfile && (
+                <View style={styles.editProfileParent}>
+
+                    <TouchableOpacity
+                    style={styles.editingOverlay}
+                    onPress={() => setIsProfile(false)} 
+                    />
+
+                    <View style={styles.editProfileChild}>
+                            <UserDetailsScreen 
+                                setIsProfile={setIsProfile}
+                                updateUserDetails={updateUserDetails}
+                                userInformation={userInformation}
+                                userDetails={userDetails}
+
+                            />
+                    </View>
+                </View>
+            )}
+            {/* ENDS */}
+
         </View>
     )
 }
@@ -199,6 +289,36 @@ const styles = StyleSheet.create({
         paddingTop: 0,
         position: 'relative'
     },
+
+    // PROFILE
+    editProfileParent:
+    {
+        flex: 1,
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        backgroundColor: 'rgba(0, 0, 0, .9)',
+        zIndex: 19,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+
+    editProfileChild:
+    {
+        width: '100%',
+        height: '70%',
+        backgroundColor: '#000',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    // ENDS
 
 
     accountChild:
@@ -323,8 +443,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
-        gap: 1,
-        marginBottom: 7
+        gap: 3,
+        paddingVertical: 10,
+        marginTop: 30
     },
 
     accountText:
@@ -391,20 +512,20 @@ const styles = StyleSheet.create({
         backgroundColor: 'green',
         width: 35,
         height: 18,
-        alignSelf: 'flex-start'
+        alignSelf: 'flex-end'
       },
 
       inactive: {
         backgroundColor: 'red',
         width: 35,
         height: 18,
-        alignSelf: 'flex-end'
+        alignSelf: 'flex-start'
       },
 
       buttonText: {
         color: '#fff',
         fontWeight: 'bold',
-        fontSize: 12,
+        fontSize: 10,
       },
 
       accountToggle:
@@ -418,6 +539,14 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: 'rgba(0, 0, 0, .2)',
         elevation: 1
-      }
+      },
+
+      editingOverlay: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      },
 
     })

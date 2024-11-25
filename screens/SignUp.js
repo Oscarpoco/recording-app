@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         position: 'relative',
-        backgroundColor: '#000',
+        backgroundColor: '#272c39',
     },
 
     signChild:
@@ -220,8 +220,8 @@ const styles = StyleSheet.create({
 
     signLogo:
     {
-        width: 100,
-        height: 100,
+        width: 200,
+        height: 200,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, .1)',
@@ -231,8 +231,8 @@ const styles = StyleSheet.create({
 
     image:
     {
-        width: 70,
-        height: 70,
+        width: 150,
+        height: 150,
         justifyContent: 'center',
         resizeMode: 'cover',
         borderRadius: 100
@@ -241,24 +241,24 @@ const styles = StyleSheet.create({
     signForm:
     {
         width: '100%',
-        height: '80%',
+        height: '87%',
         flexDirection: 'column',
-        justifyContent: 'flex-start',
+        justifyContent: 'center',
         alignItems: 'center',
         position: 'absolute',
         bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, .8)',
+        backgroundColor: 'rgba(255, 255, 255, 1)',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
-        gap: 30
+        gap: 30,
+        zIndex: 10
     },
 
     signTextTitle:
     {
-        fontSize: 24,
+        fontSize: 30,
         color: 'rgba(0, 0, 0, 5)',
         fontWeight: 900,
-        marginTop: 20,
     },
 
     signInputContainer:

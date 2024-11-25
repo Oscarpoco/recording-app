@@ -17,18 +17,30 @@ import ErrorPage from './screens/Error.js';
 // USE STATE
 
 import { useState, useEffect, useRef } from 'react';
+import * as ImagePicker from "expo-image-picker";
 
 // ENDS
 
 // FIREBASE
-import { auth } from './firebase/config.js';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, sendPasswordResetEmail  } from "firebase/auth";
+import { auth, firestore  } from './firebase/config.js';
+import 
+{ 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  onAuthStateChanged, 
+  sendPasswordResetEmail, 
+  updateProfile   
+} from "firebase/auth";
+
+import { doc, setDoc, getDoc, onSnapshot  } from "firebase/firestore";
+
 
 // EXPO
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Audio } from 'expo-av';
 
 export default function App() {
+
 
   // STATES
 
@@ -46,14 +58,85 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [isEditting, setIsEditting] = useState(false);
   const [settings, setSettings] = useState(false);
+
+  // PROFILE
   const [isProfile, setIsProfile] = useState(false);
-  const [userInformation, setUserInformation] = useState(null);
-  const [isToggled, setIsToggled] = useState(false);
+  const [userInformation, setUserInformation] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [fullNames, setFullNames] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [isToggled, setIsToggled] = useState(false);
+
+  const [userDetails, setUserDetails] = useState({
+    bio: '',
+    phone: '',
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let unsubscribeFirestore = null;
+
+    const unsubscribeAuth = auth.onAuthStateChanged((user) => {
+      if (user) {
+        const userRef = doc(firestore, 'users', user.uid);
+
+        // Fetch the document once
+        getDoc(userRef).then((doc) => {
+          if (doc.exists()) {
+            setUserDetails({
+              bio: doc.data().bio || '',
+              phone: doc.data().phone || '',
+            });
+          } else {
+            setError('User document not found in Firestore');
+          }
+          setLoading(false);
+        }).catch((error) => {
+          console.error('Error fetching user document:', error);
+          setError('Error fetching user data');
+          setLoading(false);
+        });
+
+        // Listen for real-time changes
+        unsubscribeFirestore = onSnapshot(userRef, (doc) => {
+          if (doc.exists()) {
+            setUserDetails({
+              bio: doc.data().bio || '',
+              phone: doc.data().phone || '',
+            });
+          } else {
+            setError('User document not found in Firestore');
+          }
+        }, (error) => {
+          console.error('Error in snapshot listener:', error);
+          setError('Error fetching user data');
+        });
+      } else {
+        // User is logged out
+        if (unsubscribeFirestore) {
+          unsubscribeFirestore();
+        }
+        setUserDetails({
+          bio: '',
+          phone: '',
+        });
+        setError(null);
+        setLoading(false);
+      }
+    });
+
+    // Cleanup the auth state listener
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+      }
+    };
+  }, []);
 
 
 
@@ -65,8 +148,8 @@ export default function App() {
         if (user) {
           
           try {
-            await AsyncStorage.setItem('user', JSON.stringify(user));
-            setUserInformation(user);
+            console.log('my details', userInformation);
+
           } catch (error) {
             console.error("Error saving user to AsyncStorage:", error);
           }
@@ -147,6 +230,18 @@ export default function App() {
         return;
       }
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+
+      const user = userCredential.user;
+
+      // Save user info to AsyncStorage for persistence
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+
+      // Store user information in state for immediate access
+      setUserInformation(user);
+      console.log('my info', userInformation)
+      console.log('my ALL DETAILS', userDetails)
+
       
       Toast.show({
         type: 'success',
@@ -154,8 +249,6 @@ export default function App() {
         text2: "Welcome back!",
         position: 'bottom',
       });
-
-      console.log('my info', userInformation)
 
       setView("play");
       setPassword('');
@@ -194,7 +287,12 @@ export default function App() {
         position: 'bottom',
       });
 
-      setUserInformation(null)
+      setUserInformation(null);
+      await AsyncStorage.removeItem('user');
+      setUserDetails({
+        bio:'',
+        phone:  '',
+      });
       setView("sign");
     } catch (error) {
       console.error("Logout Error:", error.message);
@@ -254,6 +352,227 @@ export default function App() {
       }
     }
   };
+  // ENDS
+
+  // EDIT PROFILE
+
+  // UPDATE USER
+  const updateUserDetails = async (user, { name, bio, phone }) => {
+    try {
+      
+      if (name) {
+        await updateProfile(user, {
+          displayName: name,
+        });
+      }
+  
+      const userDocRef = doc(firestore, "users", user.uid);
+      await setDoc(
+        userDocRef,
+        {
+          bio,
+          phone
+        },
+        { merge: true } 
+      );
+  
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'User details updated successfully!',
+        position: 'bottom',
+        duration: 3000
+      });
+
+    } catch (error) {
+      console.error("Error updating user details:", error);
+
+      Toast.show({
+        type: 'error',
+        text1: 'Failed',
+        text2: `Error : ${error}`,
+        position: 'bottom',
+        duration: 3000
+      });
+
+      throw error;
+    }
+  };
+
+  // UPDATE PROFILE PHOTO
+  // UPDATE PROFILE PHOTO
+const updateProfilePhoto = async (userInformation, file) => {
+  try {
+    // Convert blob to base64
+    const base64Data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    // Save to AsyncStorage
+    await AsyncStorage.setItem(
+      `${userInformation.uid}_profilePhoto`,
+      base64Data
+    );
+
+    // Show success toast
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: 'Profile photo updated successfully!',
+      position: 'bottom',
+      duration: 3000,
+    });
+
+    return base64Data; // Return the base64 data as the photo URL
+  } catch (error) {
+    console.error("Error updating profile photo:", error);
+    
+    Toast.show({
+      type: 'error',
+      text1: 'Failed',
+      text2: `Error: ${error.message}`,
+      position: 'bottom',
+      duration: 3000,
+    });
+
+    throw error;
+  }
+};
+
+// UPDATE COVER PHOTO
+const updateCoverPhoto = async (userInformation, file) => {
+  try {
+    // Convert blob to base64
+    const base64Data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    // Save to AsyncStorage
+    await AsyncStorage.setItem(
+      `${userInformation.uid}_coverPhoto`,
+      base64Data
+    );
+
+    // Show success toast
+    Toast.show({
+      type: 'success',
+      text1: 'Success',
+      text2: 'Cover photo updated successfully!',
+      position: 'bottom',
+      duration: 3000,
+    });
+
+    return base64Data; // Return the base64 data as the photo URL
+  } catch (error) {
+    console.error("Error updating cover photo:", error);
+    
+    Toast.show({
+      type: 'error',
+      text1: 'Failed',
+      text2: `Error: ${error.message}`,
+      position: 'bottom',
+      duration: 3000,
+    });
+
+    throw error;
+  }
+};
+
+// Handle Profile Photo Update
+const handleProfilePhotoUpdate = async (userInformation) => {
+  try {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permission required", "Permission to access the gallery is needed.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaType,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7, // Reduced quality to save storage space
+      base64: true, // Request base64 data directly
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const response = await fetch(result.assets[0].uri);
+      const file = await response.blob();
+
+      const photoURL = await updateProfilePhoto(userInformation, file);
+      return photoURL;
+    }
+  } catch (error) {
+    console.error("Error in handleProfilePhotoUpdate:", error);
+    Alert.alert(
+      "Upload Failed",
+      "There was a problem updating your profile photo. Please try again."
+    );
+  }
+};
+
+// Handle Cover Photo Update
+const handleCoverPhotoUpdate = async (userInformation) => {
+  try {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert("Permission required", "Permission to access the gallery is needed.");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaType,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 0.7, // Reduced quality to save storage space
+      base64: true, // Request base64 data directly
+    });
+
+    if (!result.canceled && result.assets[0]) {
+      const response = await fetch(result.assets[0].uri);
+      const file = await response.blob();
+
+      const coverPhotoURL = await updateCoverPhoto(userInformation, file);
+      return coverPhotoURL;
+    }
+  } catch (error) {
+    console.error("Error in handleCoverPhotoUpdate:", error);
+    Alert.alert(
+      "Upload Failed",
+      "There was a problem updating your cover photo. Please try again."
+    );
+  }
+};
+
+// Helper function to load saved photos
+const loadSavedPhotos = async (userInformation) => {
+  try {
+    const [profilePhoto, coverPhoto] = await Promise.all([
+      AsyncStorage.getItem(`${userInformation.uid}_profilePhoto`),
+      AsyncStorage.getItem(`${userInformation.uid}_coverPhoto`)
+    ]);
+
+    return {
+      profilePhoto,
+      coverPhoto
+    };
+  } catch (error) {
+    console.error("Error loading saved photos:", error);
+    return {
+      profilePhoto: null,
+      coverPhoto: null
+    };
+  }
+};
+
+  
+
   // ENDS
 
   // TOGGLE BUTTON
@@ -528,7 +847,7 @@ export default function App() {
       translateX.setValue(Dimensions.get('window').width); 
       Animated.timing(translateX, {
         toValue: 0, 
-        duration: 200,
+        duration: 500,
         useNativeDriver: true,
       }).start();
     });
@@ -573,7 +892,7 @@ export default function App() {
             onRefresh={onRefresh}
             isEditting={isEditting}
             setIsEditting={setIsEditting}
-            setIsProfile={setIsProfile}
+            
             settings={settings}
             setSettings={setSettings}
             userInformation={userInformation}
@@ -588,8 +907,16 @@ export default function App() {
           logout={logout}
           userInformation={userInformation}
           sendPasswordReset={sendPasswordReset}
-      
-
+          isProfile={isProfile}
+          setIsProfile={setIsProfile}
+          updateCoverPhoto={updateCoverPhoto}
+          updateUserDetails={updateUserDetails}
+          updateProfilePhoto={updateProfilePhoto}
+          loadSavedPhotos={loadSavedPhotos}
+          handleCoverPhotoUpdate={handleCoverPhotoUpdate}
+          handleProfilePhotoUpdate={handleProfilePhotoUpdate}
+          setUserInformation={setUserInformation}
+          userDetails={userDetails}
           />
 
         ) : view === 'sign' ? (
@@ -660,7 +987,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    bottom: 50
+    bottom: 50,
+    zIndex: 20
   },
 
 });
