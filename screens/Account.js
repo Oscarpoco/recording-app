@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
         color: '#000',
         fontSize: 14,
         fontWeight: 'bold',
-        letterSpacing: 2,
+        letterSpacing: 1,
         textAlign: 'center'
     },
 

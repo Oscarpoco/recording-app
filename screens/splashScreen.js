@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         backgroundColor: 'rgba(255, 255, 255, .5)',
-        borderRadius: 150,
+        borderRadius: 200,
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 50,
@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
         width: 300,
         height: 300,
         resizeMode: 'contain',
+        borderRadius: 200,
     },
 
      // Text style inside the firstChild

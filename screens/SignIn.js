@@ -57,6 +57,9 @@ export default function SignIn({
 
                         {/* EMAIL */}
                         <View style={styles.signInputContainer}>
+
+                            <Text style={styles.signText}>Email</Text>
+
                             <TextInput
                             style={styles.signInput}
                             placeholder="Enter your email"
@@ -68,6 +71,9 @@ export default function SignIn({
 
                         {/* PASSWORD */}
                         <View style={[styles.signInputContainer, {marginTop:25}]}>
+
+                            <Text style={styles.signText}>Password</Text>
+
                             <TextInput
                             style={styles.signInput}
                             placeholder="Enter your password"
@@ -183,13 +189,12 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         resizeMode: 'cover',
         borderRadius: 150,
-        // marginBottom: 70,
     },
 
     signForm:
     {
         width: '100%',
-        height: '80%',
+        height: '75%',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',

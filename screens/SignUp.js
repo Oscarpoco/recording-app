@@ -220,19 +220,19 @@ const styles = StyleSheet.create({
 
     signLogo:
     {
-        width: 200,
-        height: 200,
+        width: 300,
+        height: 300,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, .1)',
-        borderRadius: 100,
-        marginTop: 40
+        borderRadius: 150,
+        marginTop: 0
     },
 
     image:
     {
-        width: 150,
-        height: 150,
+        width: 170,
+        height: 170,
         justifyContent: 'center',
         resizeMode: 'cover',
         borderRadius: 100
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     signForm:
     {
         width: '100%',
-        height: '87%',
+        height: '80%',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
