@@ -1,231 +1,278 @@
-
-import { StyleSheet, Text, View, Pressable, TextInput } from 'react-native';
+// IMPORTS
+import { StyleSheet, Text, View, Pressable, TextInput, StatusBar } from 'react-native';
 
 // ICONS
-import Entypo from 'react-native-vector-icons/Entypo';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
-export default function Record({changeView, title, setTitle, saveRecording, isRecording, stopRecording, startRecording, cancelRecording, formatTime, time}) {
-  
+export default function Record({
+    changeView, 
+    title, 
+    setTitle, 
+    saveRecording, 
+    isRecording, 
+    stopRecording, 
+    startRecording, 
+    cancelRecording, 
+    formatTime, 
+    time
+}) {
     return (
-      <View style={styles.recordParent}>
+        <View style={styles.recordParent}>
+            <StatusBar barStyle="light-content" />
 
-        <View style ={styles.returnButtonParent}>
-          {/* BACK BUTTON */}
-          <Pressable style={styles.returnButton} 
-          onPress={() => {
-            changeView('play');
-          }
-          }>
-            <MaterialCommunityIcons name="keyboard-backspace" size={40} color="#fff" />
-          </Pressable>
-    
-          {/* TITLE */}
-          <TextInput
-            placeholder="Add title"
-            placeholderTextColor="#B0B0B0"
-            selectionColor="#000"
-            maxLength={15}
-            style={styles.title}
-            value={title}
-            onChangeText={setTitle}
-          />
+            {/* TOP BAR */}
+            <View style={styles.topBar}>
+                <Pressable 
+                    style={styles.backButton} 
+                    onPress={() => changeView('play')}
+                >
+                    <Ionicons name="chevron-back" size={24} color="#fff" />
+                </Pressable>
+
+                {/* TITLE INPUT */}
+                <TextInput
+                    placeholder="Recording title"
+                    placeholderTextColor="rgba(255,255,255,0.5)"
+                    selectionColor="#fff"
+                    maxLength={20}
+                    style={styles.titleInput}
+                    value={title}
+                    onChangeText={setTitle}
+                />
+            </View>
+            {/* TOP BAR ENDS */}
+
+            {/* MAIN CONTENT */}
+            <View style={styles.contentContainer}>
+                {/* HEADER */}
+                <View style={styles.header}>
+                    <Text style={styles.headerText}>Voice Recorder</Text>
+                    {isRecording && (
+                        <View style={styles.recordingIndicator}>
+                            <View style={styles.recordingDot} />
+                            <Text style={styles.recordingText}>Recording</Text>
+                        </View>
+                    )}
+                </View>
+                {/* HEADER ENDS */}
+
+                {/* VISUALIZATION */}
+                <View style={styles.visualization}>
+                    <MaterialCommunityIcons 
+                        name="waveform" 
+                        size={90} 
+                        color="rgba(0,0,0,0.4)" 
+                    />
+                    <MaterialCommunityIcons 
+                        name="waveform" 
+                        size={160} 
+                        color="rgba(0,0,0,0.7)" 
+                    />
+                    <MaterialCommunityIcons 
+                        name="waveform" 
+                        size={90} 
+                        color="rgba(0,0,0,0.4)" 
+                    />
+                </View>
+                {/* VISUALIZATION ENDS */}
+
+                {/* TIMER */}
+                <Text style={styles.timer}>{formatTime(time)}</Text>
+                {/* TIMER ENDS */}
+
+                {/* CONTROLS */}
+                <View style={styles.controls}>
+                    <Pressable 
+                        style={styles.secondaryButton} 
+                        onPress={cancelRecording}
+                    >
+                        <Ionicons name="close" size={24} color="#fff" />
+                    </Pressable>
+
+                    <Pressable 
+                        style={styles.primaryButton} 
+                        onPress={isRecording ? stopRecording : startRecording}
+                    >
+                        <FontAwesome5 
+                            name={isRecording ? "pause" : "microphone"} 
+                            size={28} 
+                            color="#fff" 
+                        />
+                    </Pressable>
+
+                    {!isRecording ? (
+                        <Pressable 
+                            style={styles.secondaryButton} 
+                            onPress={saveRecording}
+                        >
+                            <Ionicons name="checkmark" size={24} color="#fff" />
+                        </Pressable>
+                    ) : (
+                        <View style={styles.placeholderButton} />
+                    )}
+                </View>
+                {/* CONTROLS END */}
+            </View>
+            {/* MAIN CONTENT ENDS */}
         </View>
-  
-        {/* VISUALIZATION */}
-
-        <View style={styles.contentParent}>
-
-          <View style={styles.content}>
-                <Text style={styles.settingsHeader}>Recoder</Text>
-          </View>
-
-          <View style={styles.visualization}>
-            <MaterialCommunityIcons name="waveform" size={100} color="rgba(0, 0, 0, .5)" />
-            <MaterialCommunityIcons name="waveform" size={170} color="rgba(0, 0, 0, .8)" />
-            <MaterialCommunityIcons name="waveform" size={100} color="rgba(0, 0, 0, .5)" />
-          </View>
-    
-          {/* TIME */}
-          <View>
-            <Text style={styles.time}>{formatTime(time)}</Text>
-          </View>
-    
-          {/* BOTTOM NAV */}
-          <View style={styles.navParent}>
-            <Pressable style={styles.navChild} onPress={cancelRecording}>
-              <Entypo name="cross" size={30} color="#333" />
-            </Pressable>
-    
-            <Pressable style={styles.navSibling} onPress={isRecording ? stopRecording : startRecording}>
-              <MaterialCommunityIcons
-                name={isRecording ? 'pause-circle' : 'record-circle'}
-                size={50}
-                color="#FF0000"
-              />
-            </Pressable>
-    
-            {!isRecording ? (
-
-              <Pressable style={styles.navChild} onPress={saveRecording}>
-                <MaterialIcons name="done" size={30} color="#333" />
-              </Pressable>
-            ):(
-              <Pressable style={[styles.navChild, {backgroundColor: 'rgba(255, 255, 255, .0)'}]} onPress={cancelRecording}>
-
-              </Pressable>
-            )}
-          </View>
-        </View>
-      </View>
     );
-  }
+}
 
+// STYLES
 const styles = StyleSheet.create({
 
-    // PARENT 
+    // PARENT STYLES
     recordParent: 
     {
         flex: 1,
-        width: '100%',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexDirection: 'column',
-        backgroundColor: '#000',
-    },
-    // ENDS
-
-    // NAVIGATION
-    navParent:
-    {
-        // backgroundColor: '#333',
-        width: '100%',
-        paddingVertical: 7,
-        borderRadius: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-        gap: 30,
-        marginBottom: 40,
-    },
-    // ENDS
-
-    navChild:
-    {
-        width: 50 , height: 50,
-        borderRadius: 50,
-        backgroundColor: 'rgba(0, 0, 0, .3)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        backgroundColor: '#111',
     },
 
-    navSibling:
-    {
-        width: 70 , height: 70,
-        borderRadius: 50,
-        backgroundColor: 'rgba(0, 0, 0, .3)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    time:
-    {
-        fontSize: 50,
-        fontWeight: 'bold',
-        letterSpacing: 5,
-        marginBottom: 30,
-        color: 'rgba(0, 0, 0, .7)',
-    },
-
-    button:
-    {
-        backgroundColor: '#83888E45',
-        paddingVertical: 5,
-        paddingHorizontal: 15,
-        borderRadius: 50,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 3
-    },
-
-    buttonText:
-    {
-        fontWeight: 'bold',
-        fontSize: 20,
-        letterSpacing: 2,
-        color: '#fff'
-
-    },
-
-    contentParent:
-    {
-      height: '80%',
-      width: '100%',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(255, 255, 255, .8)',
-      borderRadius: 40,
-      position: 'relative'
-
-    },
-
-    visualization:
+    // TOP BAR STYLES
+    topBar: 
     {
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
-        gap: 0
+        padding: 16,
+        gap: 16,
+        marginTop: 40,
+        paddingLeft: 30
     },
 
-    returnButtonParent:
+    backButton: 
     {
-      width: '100%',
-      flexDirection: 'row',
-      justifyContent: 'flex-start',
-      alignItems: 'center',
-      marginTop: 30,
-      gap: 30,
-      paddingVertical: 10,
-      paddingHorizontal: 10,
+        padding: 8,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255,255,255,0.1)',
     },
 
-    title:
+    titleInput: 
     {
+        flex: 1,
         color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-        letterSpacing: 5,
-        paddingVertical: 10,
-        paddingHorizontal: 0,
+        fontSize: 16,
+        fontWeight: '500',
+        paddingVertical: 8,
         borderBottomWidth: 1,
-        borderColor: 'rgba(255, 255, 255, .6)',
-        width: '80%'
+        borderBottomColor: 'rgba(255,255,255,0.2)',
     },
-    // ENDS
 
-    returnButton:
+    // CONTENT STYLES
+    contentContainer: 
+    {
+        flex: 1,
+        backgroundColor: 'rgba(255, 255, 255, .4)',
+        marginTop: 24,
+        padding: 24,
+        alignItems: 'center',
+    },
+
+    // HEADER STYLES
+    header: 
+    {
+        alignItems: 'center',
+        marginBottom: 48,
+    },
+
+    headerText: 
+    {
+        fontSize: 24,
+        fontWeight: '600',
+        color: '#111',
+        marginBottom: 8,
+        letterSpacing: 1
+    },
+
+    // RECORDING INDICATOR STYLES
+    recordingIndicator: 
     {
         flexDirection: 'row',
-        justifyContent: 'flex-start',
         alignItems: 'center',
-        marginTop: 10,
+        backgroundColor: 'rgba(255,0,0,0.1)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+        gap: 8,
     },
 
-    settingsHeader:
+    recordingDot: 
     {
-      fontSize: 28,
-      fontWeight: 900,
-      letterSpacing: 2,
+        width: 8,
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#FF0000',
     },
 
-    content:
+    recordingText: 
     {
-      position: 'absolute',
-      top: 20
+        color: '#FF0000',
+        fontSize: 14,
+        fontWeight: '500',
     },
 
+    // VISUALIZATION STYLES
+    visualization: 
+    {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 2,
+        marginBottom: 48,
+    },
+
+    // TIMER STYLES
+    timer: 
+    {
+        fontSize: 48,
+        fontWeight: '700',
+        color: '#111',
+        letterSpacing: 2,
+        marginBottom: 48,
+    },
+
+    // CONTROL STYLES
+    controls: 
+    {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 24,
+        marginTop: 'auto',
+        marginBottom: 24,
+    },
+
+    primaryButton: 
+    {
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        backgroundColor: '#FF0000',
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#FF0000',
+        shadowOffset: 
+        {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+
+    secondaryButton: 
+    {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    placeholderButton: 
+    {
+        width: 48,
+        height: 48,
+    },
 });

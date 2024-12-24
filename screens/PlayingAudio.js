@@ -562,6 +562,7 @@ export default function Play({ changeView, recordings, setRecordings, onRefresh,
 
 // STYLING
 const styles = StyleSheet.create({
+
   // PARENT CONTAINER
   allRecordingsParent: {
     flex: 1,
@@ -570,11 +571,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     position: 'relative',
-    backgroundColor: '#000',
+    backgroundColor: '#111',
     paddingVertical: 20,
-    position: 'relative'
+    position: 'relative',
   },
 
+  // BUTTONS
   recordButtonParent:
   {
     flexDirection: 'row',
@@ -621,6 +623,7 @@ const styles = StyleSheet.create({
     left: 30,
     bottom: 10,
   },
+
   // NAV SIBLING
   navSibling: {
     width: 60,
@@ -707,12 +710,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 40,
     paddingVertical: 0,
     paddingHorizontal: 20,
-    borderRadius: 50,
+    borderRadius: 10,
     gap: 5,
   },
+
   searchInput: 
   {
     fontSize: 15,
@@ -725,7 +729,7 @@ const styles = StyleSheet.create({
 //   RECORDING LIST
   myRecordings: 
   {
-    height: '90%',
+    height: '86.5%',
     width: '100%',
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -733,6 +737,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderBottomColor: 'rgba(255, 255, 255, .2)',
     paddingHorizontal: 7,
+    marginTop: 20
   },
 
   recordingItem: 
@@ -741,7 +746,7 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingVertical: 11,
     width: '100%',
-    borderRadius: 15,
+    borderRadius: 10,
     marginBottom: 10.5,
     position: 'relative',
   },
@@ -765,7 +770,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#444',
     padding: 4,
     zIndex: 11,
-    borderRadius: 11,
+    borderRadius: 10,
   },
 
   // FORM
@@ -917,7 +922,8 @@ const styles = StyleSheet.create({
   {
     color: '#000',
     fontSize: 18,
-    fontWeight: 900
+    fontWeight: 900,
+    letterSpacing: 1
   },
 
   editTitleText:

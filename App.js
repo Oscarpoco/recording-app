@@ -36,7 +36,7 @@ export default function App() {
   const [recording, setRecording] = useState(null);
   const [recordedURI, setRecordedURI] = useState(null); 
   const [refreshing, setRefreshing] = useState(false);
-  const [isEditting, setIsEditting] = useState(true);
+  const [isEditting, setIsEditting] = useState(false);
 
 
   // ENDS

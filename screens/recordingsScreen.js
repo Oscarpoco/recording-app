@@ -1,86 +1,91 @@
-
-import { StyleSheet, Text, View, Pressable} from 'react-native';
+import { StyleSheet, Text, View, Pressable, StatusBar } from 'react-native';
 
 // REACT
 import { useState, useEffect } from 'react';
 
-
 // ICONS
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Entypo from 'react-native-vector-icons/Entypo';
-import Octicons from 'react-native-vector-icons/Octicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 
 // PROGRESS
 import MusicPlayer from './ProgressBar';
 
-
-
-export default function Recordings({changeView}) {
-
-
+export default function Recordings({ changeView }) {
+    const [isPlaying, setIsPlaying] = useState(false);
 
     return (
         <View style={styles.recordingParent}>
+            <StatusBar barStyle="light-content" />
 
             {/* TOP NAVIGATION */}
-                <View style={styles.topNav}>
-                    <Ionicons name="chevron-back" size={30} color="#fff" />
-                    <Octicons name="share" size={25} color="#fff" marginRight = '5' />
+            <View style={styles.topNav}>
+                <Pressable style={styles.iconButton}>
+                    <Ionicons name="chevron-back" size={24} color="#fff" />
+                </Pressable>
+                <View style={styles.topNavRight}>
+                    <Pressable style={styles.iconButton}>
+                        <FontAwesome5 name="heart" size={20} color="#fff" />
+                    </Pressable>
+                    <Pressable style={styles.iconButton}>
+                        <Ionicons name="share-outline" size={24} color="#fff" />
+                    </Pressable>
                 </View>
+            </View>
             {/* TOP NAVIGATION ENDS */}
 
             {/* TITLE */}
-            <Text
-                
-                style={styles.title}>
-                    Meeting rec
-            </Text>
+            <View style={styles.titleContainer}>
+                <Text style={styles.title}>Meeting Recording</Text>
+                <Text style={styles.subtitle}>December 24, 2024</Text>
+            </View>
             {/* TITLE ENDS*/}
 
             {/* VISUALIZATION */}
-
             <View style={styles.visualization}>
-                <MaterialCommunityIcons name="waveform" size={90} color="#03FF3E" />
-                <MaterialCommunityIcons name="waveform" size={170} color="#B600FF" />
-                <MaterialCommunityIcons name="waveform" size={90} color="#FF0000" />
+                <MaterialCommunityIcons name="waveform" size={80} color="rgba(3, 255, 62, 0.6)" />
+                <MaterialCommunityIcons name="waveform" size={160} color="rgba(182, 0, 255, 0.8)" />
+                <MaterialCommunityIcons name="waveform" size={80} color="rgba(255, 0, 0, 0.6)" />
             </View>
-
             {/* VISUALIZATION ENDS*/}
 
-            {/* BUTTON */}
-            <Pressable style={styles.button}>
-                <MaterialCommunityIcons name="waveform" size={30} color="#B600FF" />
-                <Text style={styles.buttonText}>Audio</Text>
+            {/* AUDIO TYPE BADGE */}
+            <Pressable style={styles.badge}>
+                <MaterialCommunityIcons name="waveform" size={20} color="#fff" />
+                <Text style={styles.badgeText}>High Quality Audio</Text>
             </Pressable>
             {/* ENDS */}
 
-
             {/* TIME */}
-            <View style ={styles.progress}>
-                <MusicPlayer/>
+            <View style={styles.progress}>
+                <MusicPlayer />
                 <View style={styles.duration}>
-                    <Text style ={styles.durationText}>02:30</Text>
-                    <Text style ={styles.durationText}>05:55</Text>
+                    <Text style={styles.durationText}>02:30</Text>
+                    <Text style={styles.durationText}>05:55</Text>
                 </View>
             </View>
             {/* ENDS */}
 
             {/* BOTTOM NAV */}
-            <View style={styles.navParent}>
+            <View style={styles.controls}>
+                <Pressable style={styles.secondaryButton}>
+                    <Ionicons name="reload" size={24} color="#fff" />
+                </Pressable>
 
-                <View style={styles.navChild}>
-                    <Entypo name="ccw" size={25} color="#000" />
-                </View>
+                <Pressable 
+                    style={styles.primaryButton}
+                    onPress={() => setIsPlaying(!isPlaying)}
+                >
+                    <Ionicons 
+                        name={isPlaying ? "pause" : "play"} 
+                        size={32} 
+                        color="#000" 
+                    />
+                </Pressable>
 
-                <View style={styles.navSibling}>
-                    <MaterialCommunityIcons name="play-circle" size={50} color="#03FF3E" />
-                </View>
-
-                <View style={styles.navChild}>
-                    <Entypo name="cw" size={25} color="#000" />
-                </View>
-
+                <Pressable style={styles.secondaryButton}>
+                    <Ionicons name="forward" size={24} color="#fff" />
+                </Pressable>
             </View>
             {/* ENDS */}
 
@@ -89,130 +94,114 @@ export default function Recordings({changeView}) {
 }
 
 const styles = StyleSheet.create({
-
-    // PARENT 
-    recordingParent:
-    {
+    recordingParent: {
         flex: 1,
-        width: '100%',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        flexDirection: 'column',
-        backgroundColor: '#000',
-        paddingVertical: 20,
-        paddingHorizontal: 10,
-        gap: 30
+        backgroundColor: '#111',
+        padding: 20,
+        gap: 25,
     },
-    // ENDS
 
-    // NAVIGATION
-    navParent:
-    {
-        // backgroundColor: '#333',
-        width: '100%',
-        paddingVertical: 7,
-        borderRadius: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
+    topNav: {
         flexDirection: 'row',
-        gap: 30,
-        elevation: 5
-    },
-    // ENDS
-
-    navChild:
-    {
-        width: 50, height: 50,
-        borderRadius: 50,
-        backgroundColor: '#079AE9',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    navSibling:
-    {
-        width: 80, height: 80,
-        borderRadius: 50,
-        backgroundColor: '#079AE9',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    progress:
-    {
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: 5,
-        marginBottom: 50
-    },
-
-    duration:
-    {
-        width: 325,
         justifyContent: 'space-between',
-        alignSelf: 'center',
-        flexDirection: 'row'
+        alignItems: 'center',
+        marginTop: 20,
     },
 
-    durationText:
-    {
-        fontSize: 16,
+    topNavRight: {
+        flexDirection: 'row',
+        gap: 15,
+    },
+
+    iconButton: {
+        padding: 8,
+        borderRadius: 12,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    },
+
+    titleContainer: {
+        alignItems: 'center',
+        marginTop: 20,
+    },
+
+    title: {
         color: '#fff',
-        fontWeight: 900
+        fontSize: 28,
+        fontWeight: '600',
+        letterSpacing: 1,
     },
 
-    button:
-    {
-        backgroundColor: '#83888E45',
-        paddingVertical: 7,
-        paddingHorizontal: 20,
-        borderRadius: 50,
+    subtitle: {
+        color: '#666',
+        fontSize: 16,
+        marginTop: 8,
+    },
+
+    visualization: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 4,
-        marginBottom: 10
+        gap: 2,
+        marginVertical: 40,
     },
 
-    buttonText:
-    {
-        fontWeight: '900',
-        fontSize: 18,
-        letterSpacing: 2,
-        color: '#fff'
-    },
-
-    visualization:
-    {
+    badge: {
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
-        gap: 1,
-        marginBottom: 20
+        alignSelf: 'center',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        paddingVertical: 8,
+        paddingHorizontal: 16,
+        borderRadius: 20,
+        gap: 8,
     },
 
-    title:
-    {
-        color: '#B0B0B0',
-        fontSize: 30,
-        fontWeight: 'bold',
-        letterSpacing: 5,
-        marginBottom: 30,
-        borderRadius: 10,
+    badgeText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: '500',
     },
-    // ENDS
 
-    topNav:
-    {
-        width: '100%',
-        backgroundColor: '#333',
+    progress: {
+        marginTop: 40,
+    },
+
+    duration: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        paddingHorizontal: 5,
+        marginTop: 8,
+    },
+
+    durationText: {
+        color: '#888',
+        fontSize: 14,
+        fontWeight: '500',
+    },
+
+    controls: {
+        flexDirection: 'row',
+        justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 40,
-        padding: 10,
-        borderRadius: 10,
-    }
+        gap: 20,
+        marginTop: 40,
+    },
+
+    primaryButton: {
+        width: 64,
+        height: 64,
+        borderRadius: 32,
+        backgroundColor: '#03FF3E',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    secondaryButton: {
+        width: 48,
+        height: 48,
+        borderRadius: 24,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
 });
