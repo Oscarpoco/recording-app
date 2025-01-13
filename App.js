@@ -204,7 +204,7 @@ export default function App() {
       setUserInformation(user);
 
       setView("play");
-      
+
       setPassword('');
       setEmail('');
       setConfirmPassword('');
@@ -226,7 +226,7 @@ export default function App() {
         position: 'bottom',
       });
     
-    } finally{
+    } finally {
       setLoading(false);
     }
   };
@@ -288,6 +288,8 @@ export default function App() {
         text2: errorMessage,
         position: 'bottom',
       });
+    } finally {
+      setLoading(false);
     }
   };
 
