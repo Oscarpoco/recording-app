@@ -169,6 +169,8 @@ export default function App() {
 
   // Function to handle user registration
   const register = async () => {
+
+    setLoading(true);
     try {
       if (!email || !password) {
         
@@ -186,11 +188,23 @@ export default function App() {
       Toast.show({
         type: 'success',
         text1: 'Success',
-        text2: "Registration complete! You can now log in.",
+        text2: `Account ${userCredential.email} created successfully!`,
         position: 'bottom',
       });
       
+      const login = await signInWithEmailAndPassword(auth, email, password);
+
+
+      const user = login.user;
+
+      // Save user info to AsyncStorage for persistence
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+
+      // Store user information in state for immediate access
+      setUserInformation(user);
+
       setView("play");
+      
       setPassword('');
       setEmail('');
       setConfirmPassword('');
@@ -212,11 +226,15 @@ export default function App() {
         position: 'bottom',
       });
     
+    } finally{
+      setLoading(false);
     }
   };
 
   // Function to handle user login
   const login = async () => {
+
+    setLoading(true);
     try {
       if (!email || !password) {
         
@@ -229,6 +247,7 @@ export default function App() {
 
         return;
       }
+
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
 
@@ -239,14 +258,12 @@ export default function App() {
 
       // Store user information in state for immediate access
       setUserInformation(user);
-      console.log('my info', userInformation)
-      console.log('my ALL DETAILS', userDetails)
 
       
       Toast.show({
         type: 'success',
         text1: 'Success',
-        text2: "Welcome back!",
+        text2: `Welcome back! ${user?.name || user?.email || ''}`,
         position: 'bottom',
       });
 
@@ -358,6 +375,8 @@ export default function App() {
 
   // UPDATE USER
   const updateUserDetails = async (user, { name, bio, phone }) => {
+
+    setLoading(true)
     try {
       
       if (name) {
@@ -396,12 +415,15 @@ export default function App() {
       });
 
       throw error;
+    } finally{
+      setLoading(false)
     }
   };
 
-  // UPDATE PROFILE PHOTO
+
   // UPDATE PROFILE PHOTO
 const updateProfilePhoto = async (userInformation, file) => {
+  setLoading(true)
   try {
     // Convert blob to base64
     const base64Data = await new Promise((resolve, reject) => {
@@ -439,6 +461,8 @@ const updateProfilePhoto = async (userInformation, file) => {
     });
 
     throw error;
+  } finally{
+    setLoading(false)
   }
 };
 
@@ -486,6 +510,8 @@ const updateCoverPhoto = async (userInformation, file) => {
 
 // Handle Profile Photo Update
 const handleProfilePhotoUpdate = async (userInformation) => {
+
+  setLoading(true)
   try {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
@@ -497,8 +523,8 @@ const handleProfilePhotoUpdate = async (userInformation) => {
       mediaTypes: ImagePicker.MediaType,
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.7, // Reduced quality to save storage space
-      base64: true, // Request base64 data directly
+      quality: 0.7, 
+      base64: true, 
     });
 
     if (!result.canceled && result.assets[0]) {
@@ -514,6 +540,8 @@ const handleProfilePhotoUpdate = async (userInformation) => {
       "Upload Failed",
       "There was a problem updating your profile photo. Please try again."
     );
+  } finally{
+    setLoading(false);
   }
 };
 
@@ -917,6 +945,7 @@ const loadSavedPhotos = async (userInformation) => {
           handleProfilePhotoUpdate={handleProfilePhotoUpdate}
           setUserInformation={setUserInformation}
           userDetails={userDetails}
+          loading ={loading}
           />
 
         ) : view === 'sign' ? (
@@ -930,7 +959,7 @@ const loadSavedPhotos = async (userInformation) => {
           password={password}
           setPassword={setPassword}
           login={login}
-          
+          loading ={loading}
           />
         ) : view === 'signUp' ? (
             <SignUp
@@ -947,7 +976,7 @@ const loadSavedPhotos = async (userInformation) => {
             register={register}
             confirmPassword={confirmPassword}
             setConfirmPassword={setConfirmPassword}
-            
+            loading ={loading}
             />
         ) : (
           <ErrorPage/>

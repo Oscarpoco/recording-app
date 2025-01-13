@@ -1,306 +1,184 @@
-import 
-{
+import React from 'react';
+import {
     View,
-    StyleSheet,
     Text,
-    Image,
     TextInput,
-    TouchableOpacity
-}
-from 'react-native';
-
-// ICONS
-import Feather from 'react-native-vector-icons/Feather';
-
+    TouchableOpacity,
+    StyleSheet,
+    SafeAreaView,
+    KeyboardAvoidingView,
+    Platform,
+    StatusBar,
+    ActivityIndicator
+} from 'react-native';
+import { Feather } from '@expo/vector-icons';
 
 export default function SignIn({
-    changeView, 
-    showPassword, 
-    setShowPassword, 
-    login, 
-    email, 
-    password, 
-    setEmail, 
-    setPassword, 
-    sendPasswordReset, 
-}){
+    changeView,
+    showPassword,
+    setShowPassword,
+    login,
+    email,
+    password,
+    setEmail,
+    setPassword,
+    loading
+}) {
+    return (
+        <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="dark-content" />
+            <KeyboardAvoidingView 
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.content}
+            >
+                <View style={styles.form}>
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <Text style={styles.title}>Login</Text>
+                        <Text style={styles.subtitle}>Please sign in to continue</Text>
+                    </View>
 
-    const myEmail = 'okpoco15@gmail';
-
-
-    return(
-        <View style={styles.signParent}>
-            {/* BACKGROUND */}
-                <Image
-                source={require('../assets/splashScreen.jpg')} 
-                style={styles.Backgroundimage}
-                />
-            {/* ENDS */}
-
-            <View style={[styles.signChild, styles.blurOverlay]}>
-
-                {/* LOGO */}
-                <View style={styles.signLogo}>
-                    <Image
-                    source={require('../assets/download.jpg')} 
-                    style={styles.image}
-                    />
-                </View>
-                {/* ENDS */}
-
-                {/* FORM WRAPPER*/}
-                <View style={styles.signForm}>
-                    <Text style={styles.signTextTitle}>Welcome back</Text>
-
-                    {/* FORM */}
-                    <View>
-
-                        {/* EMAIL */}
-                        <View style={styles.signInputContainer}>
-
-                            <Text style={styles.signText}>Email</Text>
-
-                            <TextInput
-                            style={styles.signInput}
-                            placeholder="Enter your email"
+                    {/* Email Field */}
+                    <View style={styles.fieldContainer}>
+                        <Feather name="mail" size={20} color="#7B8794" />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Email"
+                            placeholderTextColor="#7B8794"
                             value={email}
                             onChangeText={setEmail}
-                            />
-                        </View>
-                        {/* ENDS */}
+                            keyboardType="email-address"
+                            autoCapitalize="none"
+                        />
+                    </View>
 
-                        {/* PASSWORD */}
-                        <View style={[styles.signInputContainer, {marginTop:25}]}>
-
-                            <Text style={styles.signText}>Password</Text>
-
-                            <TextInput
-                            style={styles.signInput}
-                            placeholder="Enter your password"
+                    {/* Password Field */}
+                    <View style={styles.fieldContainer}>
+                        <Feather name="lock" size={20} color="#7B8794" />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Password"
+                            placeholderTextColor="#7B8794"
                             secureTextEntry={!showPassword}
                             value={password}
                             onChangeText={setPassword}
+                        />
+                        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                            <Feather 
+                                name={showPassword ? 'eye' : 'eye-off'} 
+                                size={20} 
+                                color="#7B8794" 
                             />
-
-                            <TouchableOpacity
-                                onPress={() => setShowPassword(!showPassword)}
-                                style={styles.eyeIcon}
-                            >
-                                <Feather
-                                    name={showPassword ? 'eye' : 'eye-off'}
-                                    size={20}
-                                    color="gray"
-                                />
-                            </TouchableOpacity>
-
-                        </View>
-                        {/* ENDS */}
-
-                        {/* BUTTON */}
-                        <TouchableOpacity style={styles.signButton} onPress={()=> login()}>
-                            <Text style={styles.signButtonText}>Login</Text>
                         </TouchableOpacity>
-
-                        <TouchableOpacity style={styles.signForgot} onPress={()=> sendPasswordReset(myEmail)}>
-                            <Text style={styles.signForgotText}>Forgot Password?</Text>
-                        </TouchableOpacity>
-                        {/* ENDS */}
                     </View>
-                    {/* ENDS */}
 
-                    {/* FORGOT PASSWORD */}
-                    <View style={styles.signUpParent}>
+                    {/* Login Button */}
+                    <TouchableOpacity style={styles.button} onPress={login}>
+                        <Text style={styles.buttonText}>
+                            
+                            {loading ? <ActivityIndicator/> : 'Login'}
+                        </Text>
+                    </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.signUp} onPress={()=> changeView('signUp')}>
-                            <Text style={[styles.signForgotText, {fontSize: 15}]}>New Account</Text>
-                            <Feather name="arrow-right-circle" size={30} color="rgba(0, 0, 0, .5)" />
+                    {/* Sign Up Section */}
+                    <View style={styles.signupContainer}>
+                        <Text style={styles.signupText}>Don't have an account? </Text>
+                        <TouchableOpacity onPress={() => changeView('signUp')}>
+                            <Text style={styles.signupLink}>
+                                Sign Up
+                            </Text>
                         </TouchableOpacity>
-
                     </View>
-                    {/* ENDS */}
                 </View>
-                {/* ENDS */}
-            </View>
-            
-        </View>
-    )
+            </KeyboardAvoidingView>
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
-
-    signParent:
-    {
+    container: {
         flex: 1,
-        width: '100%',
-        flexDirection: 'column',
-        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+    },
+    content: {
+        flex: 1,
         justifyContent: 'center',
-        position: 'relative',
-        backgroundColor: '#000',
     },
-
-    signChild:
-    {
-        width: '100%',
-        height: '100%',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        position: 'absolute',
+    form: {
+        paddingHorizontal: 20, 
+        width: '100%', 
     },
-
-    blurOverlay: 
-    {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0, 0, 0, 1)', 
-        backdropFilter: 'blur(100px)',
-      
+    header: {
+        marginBottom: 32,
     },
-      
-    Backgroundimage:
-      
-    {
-        width: '100%',
-        height: '100%',
-        position: 'absolute', 
-        top: 0,
-        left: 0,
-        resizeMode: 'cover',
-      
+    title: {
+        fontSize: 32,
+        fontWeight: '700',
+        color: '#1A1A1A',
+        textAlign: 'center',
+        marginBottom: 8,
     },
-
-    signLogo:
-    {
-        width: 350,
-        height: 350,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: 'rgba(255, 255, 255, .1)',
-        borderRadius: 200,
-        marginTop: 20,
-      
-
-    },
-
-    image:
-    {
-        width: 200,
-        height: 200,
-        justifyContent: 'center',
-        resizeMode: 'cover',
-        borderRadius: 150,
-    },
-
-    signForm:
-    {
-        width: '100%',
-        height: '75%',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        position: 'absolute',
-        bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, 1)',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        paddingTop: 20,
-        gap: 50,
-        zIndex: 1
-    },
-
-    signTextTitle:
-    {
-        fontSize: 30,
-        color: 'rgba(0, 0, 0, 5)',
-        fontWeight: 900,
-    },
-
-    signInputContainer:
-    {
-        width: 300,
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'flex-start',
-        gap: 5,
-        position: 'relative'
-    },
-
-    signText:
-    {
+    subtitle: {
         fontSize: 16,
-        fontWeight: 900,
-        color: '#333',
-        letterSpacing: 1,
-        marginLeft: 10
-    },
-
-    signInput:
-    {
-        backgroundColor: 'rgba(0, 0, 0, .1)',
-        width: '100%',
-        height: 50,
-        borderRadius: 10,
-        paddingHorizontal: 20,
-        fontSize: 14,
-        fontWeight: 900,
-    },
-
-    signButton:
-    {
-        backgroundColor: 'rgba(0, 0, 0, 1)',
-        width: 300,
-        height: 50,
-        borderRadius: 10,
-        paddingHorizontal: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: 30
-
-    },
-
-    signButtonText:
-    {
-        fontSize: 16,
-        color: '#fff',
-        fontWeight: 900,
+        color: '#7B8794',
         textAlign: 'center',
     },
-
-    signUpParent:
-    {
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        width: 310,
-        marginTop: 20,
+    fieldContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E4E7EB',
+        paddingVertical: 12,
+        marginBottom: 16,
+        width: '100%', // Ensure it stretches full width
     },
-
-    signForgot:
-    {
-        marginLeft: 5,
-        marginTop: 15,
+    input: {
+        flex: 1,
+        marginLeft: 12,
+        fontSize: 16,
+        color: '#1A1A1A',
     },
-
-    signForgotText:
-    {
-        fontSize: 13,
-        letterSpacing: 1,
-        fontWeight: 900,
+    forgotPasswordContainer: {
+        alignSelf: 'flex-end',
+        marginBottom: 24,
     },
-
-    signUp:
-    {
+    forgotPasswordText: {
+        color: '#4A5568',
+        fontSize: 14,
+    },
+    button: {
+        backgroundColor: '#2B6CB0',
+        borderRadius: 12,
+        height: 52,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 24,
+        shadowColor: '#2B6CB0',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.2,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    buttonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    signupContainer: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        gap: 10,
     },
-
-    eyeIcon: {
-        bottom: 15,
-        right: 15,
-        position: 'absolute'
-
+    signupText: {
+        color: '#4A5568',
+        fontSize: 14,
     },
-
-
-})
+    signupLink: {
+        color: '#2B6CB0',
+        fontSize: 14,
+        fontWeight: '600',
+    },
+});

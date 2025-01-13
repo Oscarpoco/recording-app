@@ -4,7 +4,8 @@ import
     StyleSheet,
     Text,
     Image,
-    TouchableOpacity
+    TouchableOpacity,
+    ActivityIndicator
 }
 from 'react-native';
 
@@ -15,8 +16,6 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import UserDetailsScreen from './UserDetailsScreen';
-
-import { auth } from "../firebase/config.js";
 
 
 
@@ -36,6 +35,7 @@ export default function Account(
         handleProfilePhotoUpdate,
         handleCoverPhotoUpdate,
         userDetails,
+        loading
     }){
 
         const [profileImage, setProfileImage] = useState(null);
@@ -263,6 +263,7 @@ export default function Account(
                                 updateUserDetails={updateUserDetails}
                                 userInformation={userInformation}
                                 userDetails={userDetails}
+                                loading = {loading}
 
                             />
                     </View>

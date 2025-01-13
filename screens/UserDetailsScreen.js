@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator } from "react-native";
 
 
 import { auth } from "../firebase/config.js";
@@ -8,7 +8,8 @@ import { auth } from "../firebase/config.js";
 const UserDetailsScreen = ({
     updateUserDetails,
     userInformation,
-    userDetails
+    userDetails,
+    loading
     }) => {
 
   const [name, setName] = useState("");
@@ -57,7 +58,9 @@ const handleUpdateDetails = async () => {
       />
 
       <TouchableOpacity style={styles.saveButton} onPress={()=>handleUpdateDetails()}>
-        <Text style={styles.saveButtonText}>Update</Text>
+        <Text style={styles.saveButtonText}>
+          {loading ? <ActivityIndicator/> : 'Update'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
