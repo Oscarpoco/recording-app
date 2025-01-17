@@ -62,16 +62,16 @@ export default function SignUp({
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" />
+            <StatusBar barStyle="light-content" />
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.content}
             >
+
+                <View style={styles.form}>
                 <View style={styles.header}>
                     <Text style={styles.title}>Get Started</Text>
                 </View>
-
-                <View style={styles.form}>
                     {/* Email Input */}
                     <View style={styles.fieldContainer}>
                         <Feather name="mail" size={20} color="#7B8794" />
@@ -129,7 +129,7 @@ export default function SignUp({
                     {/* Register Button */}
                     <TouchableOpacity style={styles.button} onPress={handleRegister}>
                         <Text style={styles.buttonText}>
-                            {loading ? <ActivityIndicator/> : 'Register'}
+                            {loading ? <ActivityIndicator color={'#fff'}/> : 'Register'}
                         </Text>
                     </TouchableOpacity>
 
@@ -151,7 +151,7 @@ export default function SignUp({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#000',
     },
     content: {
         flex: 1,
@@ -167,9 +167,14 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 32,
         fontWeight: '700',
-        color: '#1A1A1A',
+        color: '#7B8794',
         textAlign: 'center',
         marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 16,
+        color: '#7B8794',
+        textAlign: 'center',
     },
     fieldContainer: {
         flexDirection: 'row',
@@ -178,15 +183,21 @@ const styles = StyleSheet.create({
         borderBottomColor: '#E4E7EB',
         paddingVertical: 12,
         marginBottom: 16,
-        width: '100%', // Stretches to full width
-        paddingHorizontal: 15, // Add padding for better spacing
+        width: '100%', 
     },
     input: {
         flex: 1,
         marginLeft: 12,
         fontSize: 16,
-        color: '#1A1A1A',
-        width: '100%', // Ensure input fills available space
+        color: '#7B8794',
+    },
+    forgotPasswordContainer: {
+        alignSelf: 'flex-end',
+        marginBottom: 24,
+    },
+    forgotPasswordText: {
+        color: '#4A5568',
+        fontSize: 14,
     },
     button: {
         backgroundColor: '#2B6CB0',

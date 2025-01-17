@@ -148,8 +148,7 @@ export default function App() {
         if (user) {
           
           try {
-            console.log('my details', userInformation);
-
+            setUserInformation(user);
           } catch (error) {
             console.error("Error saving user to AsyncStorage:", error);
           }
@@ -188,7 +187,7 @@ export default function App() {
       Toast.show({
         type: 'success',
         text1: 'Success',
-        text2: `Account ${userCredential.email} created successfully!`,
+        text2: `Account ${email} created successfully!`,
         position: 'bottom',
       });
       
@@ -196,6 +195,7 @@ export default function App() {
 
 
       const user = login.user;
+      // console.log("UserData", user);
 
       // Save user info to AsyncStorage for persistence
       await AsyncStorage.setItem('user', JSON.stringify(user));
@@ -560,8 +560,8 @@ const handleCoverPhotoUpdate = async (userInformation) => {
       mediaTypes: ImagePicker.MediaType,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 0.7, // Reduced quality to save storage space
-      base64: true, // Request base64 data directly
+      quality: 0.7, 
+      base64: true, 
     });
 
     if (!result.canceled && result.assets[0]) {
@@ -922,32 +922,30 @@ const loadSavedPhotos = async (userInformation) => {
             onRefresh={onRefresh}
             isEditting={isEditting}
             setIsEditting={setIsEditting}
-            
             settings={settings}
             setSettings={setSettings}
             userInformation={userInformation}
           />
         ) : view === 'profile' ? (
           <Account
-
-          changeView={changeView}
-          setSettings={setSettings}
-          toggleButton={toggleButton}
-          isToggled={isToggled}
-          logout={logout}
-          userInformation={userInformation}
-          sendPasswordReset={sendPasswordReset}
-          isProfile={isProfile}
-          setIsProfile={setIsProfile}
-          updateCoverPhoto={updateCoverPhoto}
-          updateUserDetails={updateUserDetails}
-          updateProfilePhoto={updateProfilePhoto}
-          loadSavedPhotos={loadSavedPhotos}
-          handleCoverPhotoUpdate={handleCoverPhotoUpdate}
-          handleProfilePhotoUpdate={handleProfilePhotoUpdate}
-          setUserInformation={setUserInformation}
-          userDetails={userDetails}
-          loading ={loading}
+            changeView={changeView}
+            setSettings={setSettings}
+            toggleButton={toggleButton}
+            isToggled={isToggled}
+            logout={logout}
+            userInformation={userInformation}
+            sendPasswordReset={sendPasswordReset}
+            isProfile={isProfile}
+            setIsProfile={setIsProfile}
+            updateCoverPhoto={updateCoverPhoto}
+            updateUserDetails={updateUserDetails}
+            updateProfilePhoto={updateProfilePhoto}
+            loadSavedPhotos={loadSavedPhotos}
+            handleCoverPhotoUpdate={handleCoverPhotoUpdate}
+            handleProfilePhotoUpdate={handleProfilePhotoUpdate}
+            setUserInformation={setUserInformation}
+            userDetails={userDetails}
+            loading ={loading}
           />
 
         ) : view === 'sign' ? (
@@ -1006,9 +1004,9 @@ const styles = StyleSheet.create({
   container: 
   {
     flex: 1,
-    width: '100%',
-    alignItems: 'center',
-    justifyContent: 'center',
+    // width: '100%',
+    // alignItems: 'center',
+    // justifyContent: 'center',
     position: 'relative'
   },
 

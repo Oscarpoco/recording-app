@@ -26,7 +26,7 @@ export default function SignIn({
 }) {
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" />
+            <StatusBar barStyle="light-content" />
             <KeyboardAvoidingView 
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.content}
@@ -76,7 +76,7 @@ export default function SignIn({
                     <TouchableOpacity style={styles.button} onPress={login}>
                         <Text style={styles.buttonText}>
                             
-                            {loading ? <ActivityIndicator/> : 'Login'}
+                            {loading ? <ActivityIndicator color={'#fff'}/> : 'Login'}
                         </Text>
                     </TouchableOpacity>
 
@@ -98,7 +98,7 @@ export default function SignIn({
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#000',
     },
     content: {
         flex: 1,
@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 32,
         fontWeight: '700',
-        color: '#1A1A1A',
+        color: '#7B8794',
         textAlign: 'center',
         marginBottom: 8,
     },
@@ -130,13 +130,13 @@ const styles = StyleSheet.create({
         borderBottomColor: '#E4E7EB',
         paddingVertical: 12,
         marginBottom: 16,
-        width: '100%', // Ensure it stretches full width
+        width: '100%', 
     },
     input: {
         flex: 1,
         marginLeft: 12,
         fontSize: 16,
-        color: '#1A1A1A',
+        color: '#7B8794',
     },
     forgotPasswordContainer: {
         alignSelf: 'flex-end',

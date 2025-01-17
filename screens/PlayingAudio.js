@@ -289,7 +289,7 @@ export default function Play(
         <View style={styles.searchContainer}>
 
           <View style={styles.AccountHeader}>
-              <Text style={styles.AccountText}>Welcome back</Text>
+              <Text style={styles.AccountText}>Welcome {userInformation?.displayName || 'Guest'} 👋</Text>
               <TouchableOpacity onPress={()=> changeView('profile')} style={styles.menu}>
                   <Entypo name="menu" size={25} color="rgba(255, 255, 255, .5)" />
               </TouchableOpacity>

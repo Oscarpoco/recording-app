@@ -66,6 +66,8 @@ export default function Account(
         }, [userInformation]);
 
         const onProfilePhotoUpdate = async () => {
+
+            setIsLoading(true)
             try {
             const photoURL = await handleProfilePhotoUpdate(userInformation);
             if (photoURL) {
@@ -73,10 +75,14 @@ export default function Account(
             }
             } catch (error) {
             console.error("Error in onProfilePhotoUpdate:", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         const onCoverPhotoUpdate = async () => {
+
+            setIsLoading(true)
             try {
             const coverURL = await handleCoverPhotoUpdate(userInformation);
             if (coverURL) {
@@ -84,6 +90,8 @@ export default function Account(
             }
             } catch (error) {
             console.error("Error in onCoverPhotoUpdate:", error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -104,11 +112,18 @@ export default function Account(
             <View style={styles.secondAccountChild}>
 
                 {/* COVER */}
-                <View syle={styles.accountChildCover}>
+                <View syle={styles.accountChildCover}>    
+
+                    {
+                    isLoading ? 
+                        <ActivityIndicator size={'large'} color={'#000'}/> 
+                        : 
+
                         <Image 
                          source={coverImage || require("../assets/cover.jpg")}  
                         style={styles.BackgroundCover}
                         />
+                    }
 
                         <TouchableOpacity style={styles.accountChildBackgroundCoverButton} onPress={()=> onCoverPhotoUpdate()}>
                             <MaterialCommunityIcons name="camera" size={25} color="#000" />
@@ -120,10 +135,18 @@ export default function Account(
                 {/* PROFILE PICTURE */}
                 <View style={styles.accountChildProfilePicture}>
 
-                    <Image 
-                     source={profileImage || require("../assets/user.jpg")} 
-                    style={styles.BackgroundProfile}
-                    />
+                    
+
+                    {
+                    isLoading ? 
+                        <ActivityIndicator size={'small'} color={'#000'}/> 
+                        : 
+
+                        <Image 
+                        source={ profileImage || require("../assets/user.jpg")} 
+                        style={styles.BackgroundProfile}
+                        />
+                    }
 
                     <TouchableOpacity style={styles.accountChildProfilePictureButton} onPress={()=> onProfilePhotoUpdate()}>
                         <MaterialCommunityIcons name="camera" size={25} color="#000" />
@@ -148,14 +171,14 @@ export default function Account(
 
                         <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> setIsProfile(true)}>
                             <View style={styles.accountChildContentItemButtonIcon}>
-                                <AntDesign name="profile" size={15} color="#333" />
+                                <AntDesign name="profile" size={15} color="#000" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Edit profile</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> sendPasswordReset(userEmail)}>
                             <View style={styles.accountChildContentItemButtonIcon}>
-                                <MaterialIcons name="password" size={15} color="#333" />
+                                <MaterialIcons name="password" size={15} color="#000" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Change password</Text>
                         </TouchableOpacity>
@@ -168,7 +191,7 @@ export default function Account(
 
                         <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
                             <View style={styles.accountChildContentItemButtonIcon}>
-                                <MaterialIcons name="backup" size={15} color="#333" />
+                                <MaterialIcons name="backup" size={15} color="#000" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Backup</Text>
                         </TouchableOpacity>
@@ -194,7 +217,7 @@ export default function Account(
 
                         <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
                             <View style={styles.accountChildContentItemButtonIcon}>
-                                <MaterialIcons name="sync" size={15} color="#333" />
+                                <MaterialIcons name="sync" size={15} color="#000" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Sync</Text>
                         </TouchableOpacity>
@@ -216,13 +239,7 @@ export default function Account(
 
                     {/* THIRD SECTION */}
                     <View style={styles.accountChildContentItem}>
-                        <TouchableOpacity style={styles.accountChildContentItemButtonWrap}>
-                            <View style={styles.accountChildContentItemButtonIcon}>
-                                <MaterialCommunityIcons name="lock" size={15} color="#333" />
-                            </View>
-                            <Text style={styles.accountChildContentItemButtonText}>Security & privacy</Text>
-                        </TouchableOpacity>
-
+                        
                         <TouchableOpacity style={styles.accountChildContentItemButtonWrap} 
                         onPress={()=> {
                             setSettings(true);
@@ -230,14 +247,14 @@ export default function Account(
                         }
                         }>
                             <View style={styles.accountChildContentItemButtonIcon}>
-                                <MaterialIcons name="feedback" size={15} color="#333" />
+                                <MaterialIcons name="feedback" size={15} color="#000" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Feedback</Text>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={styles.accountChildContentItemButtonWrap} onPress={()=> logout()}>
                             <View style={styles.accountChildContentItemButtonIcon}>
-                                <MaterialCommunityIcons name="logout" size={15} color="#333" />
+                                <MaterialCommunityIcons name="logout" size={15} color="#000" />
                             </View>
                             <Text style={styles.accountChildContentItemButtonText}>Logout</Text>
                         </TouchableOpacity>
@@ -275,10 +292,25 @@ export default function Account(
     )
 }
 
-const styles = StyleSheet.create({
+const colors = {
+    primary: '#2563EB',           // Rich blue
+    secondary: '#1E293B',         // Dark slate
+    accent: '#3B82F6',           // Bright blue
+    background: '#0F172A',        // Deep navy
+    surface: '#1E293B',          // Slate blue
+    text: {
+        primary: '#F8FAFC',      // Almost white
+        secondary: '#CBD5E1',    // Light gray
+        tertiary: '#94A3B8'      // Muted gray
+    },
+    border: '#334155',           // Medium slate
+    success: '#10B981',          // Green
+    error: '#EF4444',           // Red
+    overlay: 'rgba(15, 23, 42, 0.9)' // Dark overlay
+};
 
-    accountParent:
-    {
+export const styles = StyleSheet.create({
+    accountParent: {
         flex: 1,
         width: '100%',
         height: '100%',
@@ -286,14 +318,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-start',
         position: 'relative',
-        backgroundColor: '#000',
+        backgroundColor: colors.background,
         paddingTop: 0,
-        position: 'relative'
     },
 
-    // PROFILE
-    editProfileParent:
+    accountHeaderButton:
     {
+        width: 50,
+        height: 50,
+        backgroundColor: 'rgba(0, 0, 0, .7)',
+        borderRadius: 35
+    },
+
+    editProfileParent: {
         flex: 1,
         width: '100%',
         height: '100%',
@@ -303,27 +340,25 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0, 0, 0, .9)',
+        backgroundColor: colors.overlay,
         zIndex: 19,
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
     },
 
-    editProfileChild:
-    {
+    editProfileChild: {
         width: '100%',
         height: '70%',
-        backgroundColor: '#000',
+        backgroundColor: colors.surface,
         alignItems: 'center',
         justifyContent: 'center',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
+        borderWidth: 1,
+        borderColor: colors.border,
     },
-    // ENDS
 
-
-    accountChild:
-    {
+    accountChild: {
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
@@ -332,91 +367,94 @@ const styles = StyleSheet.create({
         paddingHorizontal: 15,
         position: 'absolute',
         top: 30,
-        zIndex: 11
-
-
+        zIndex: 11,
     },
 
-    // SECOND
-    secondAccountChild:
-    {
+    secondAccountChild: {
         width: '100%',
         height: '35%',
         position: 'relative',
-        backgroundColor: 'rgba(255, 255, 255, .7)',
+        backgroundColor: colors.surface,
     },
 
-    accountChildCover:
-    {
+    accountChildCover: {
         width: '100%',
         height: '100%',
     },
 
-    BackgroundCover:
-    {
+    BackgroundCover: {
         width: '100%',
         height: '100%',
-        resizeMode: 'cover'
+        resizeMode: 'cover',
     },
 
-    accountChildProfilePicture:
-    {
+    accountChildProfilePicture: {
         width: 130,
         height: 130,
         position: 'absolute',
         bottom: -30,
+        left: 10,
         borderRadius: 150,
-        alignSelf: 'center',
-        backgroundColor: 'rgba(255, 255, 255, .6)',
+        alignSelf: 'left',
+        backgroundColor: colors.surface,
         padding: 2,
-        zIndex: 10
+        zIndex: 10,
+        borderWidth: 3,
+        borderColor: colors.primary,
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
+        elevation: 8,
     },
 
-    BackgroundProfile:
-    {
+    BackgroundProfile: {
         width: '100%',
         height: '100%',
         resizeMode: 'cover',
-        borderRadius: 100
+        borderRadius: 100,
     },
 
-    accountChildProfilePictureButton:
-    {
+    accountChildProfilePictureButton: {
         position: 'absolute',
         bottom: 0,
         right: 0,
         width: 40,
         height: 40,
-        backgroundColor: 'rgba(255, 255, 255, .8)',
+        backgroundColor: colors.primary,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 50,
-        elevation: 10
+        elevation: 10,
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
 
-    accountChildBackgroundCoverButton:
-    {
+    accountChildBackgroundCoverButton: {
         position: 'absolute',
-        bottom:50,
+        bottom: 50,
         right: 30,
         width: 40,
         height: 40,
-        backgroundColor: 'rgba(255, 255, 255, .9)',
+        backgroundColor: colors.primary,
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 50,
-        elevation: 10
+        elevation: 10,
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
 
-    // THIRD
-    thirdAccountChild:
-    {
+    thirdAccountChild: {
         width: '100%',
         height: '70%',
-        backgroundColor: '#FFFAFA',
-        backgroundColor: '#000',
+        backgroundColor: colors.background,
         position: 'absolute',
         bottom: 0,
         zIndex: 9,
@@ -424,130 +462,128 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
     },
 
-    thirdAccountChildContent:
-    {
+    thirdAccountChildContent: {
         width: '100%',
         height: '100%',
-        backgroundColor: 'rgba(255, 255, 255, .6)',
         borderTopLeftRadius: 20,
         borderTopRightRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'column',
         gap: 10,
-        paddingHorizontal: 15
+        paddingHorizontal: 15,
+        backgroundColor: colors.surface,
     },
 
-    accountChildContentAbout:
-    {
-        width: '100%',
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'column',
-        gap: 3,
-        paddingVertical: 10,
-        marginTop: 30
-    },
-
-    accountText:
-    {
-        color: '#000',
-        fontSize: 24,
-        fontWeight: 'bold',
-        letterSpacing: 2,
-        textAlign: 'center'
-    },
-
-    accountTextBio:
-    {
-        color: '#000',
-        fontSize: 14,
-        fontWeight: 'bold',
-        letterSpacing: 1,
-        textAlign: 'center'
-    },
-
-    accountChildContentItem:
-    {
+    accountChildContentAbout: {
         width: '100%',
         justifyContent: 'center',
         alignItems: 'flex-start',
+        flexDirection: 'column',
+        gap: 3,
         paddingVertical: 10,
-        paddingHorizontal: 20,
-        backgroundColor: 'rgba(255, 255, 255, .2)',
-        borderRadius: 10,
-        gap: 5
+        marginTop: 10,
     },
-    
-    accountChildContentItemButtonWrap:
-    {
+
+    accountText: {
+        color: colors.text.primary,
+        fontSize: 24,
+        fontWeight: 'bold',
+        letterSpacing: 1,
+    },
+
+    accountTextBio: {
+        color: colors.text.secondary,
+        fontSize: 16,
+        fontWeight: '500',
+        letterSpacing: 0.5,
+    },
+
+    accountChildContentItem: {
+        width: '100%',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        backgroundColor: colors.primary,
+        borderRadius: 10,
+        gap: 5,
+        marginTop: 5,
+        opacity: 0.9,
+        shadowColor: colors.primary,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 3,
+        elevation: 4,
+    },
+
+    accountChildContentItemButtonWrap: {
         flexDirection: 'row',
         gap: 15,
         justifyContent: 'flex-start',
         alignItems: 'center',
+        width: '100%',
     },
 
-    accountChildContentItemButtonIcon:
-    {
+    accountChildContentItemButtonIcon: {
         width: 30,
         height: 30,
-        backgroundColor: 'rgba(255, 255, 255, .1)',
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 50
+        borderRadius: 50,
     },
 
-    accountChildContentItemButtonText:
-    {
-        color: '#333',
+    accountChildContentItemButtonText: {
+        color: colors.text.primary,
         fontSize: 16,
-        fontWeight: 900
+        fontWeight: '600',
     },
 
     toggleButton: {
         borderRadius: 30,
         justifyContent: 'center',
         alignItems: 'center',
-      },
-      active: {
-        backgroundColor: 'green',
+    },
+
+    active: {
+        backgroundColor: colors.success,
         width: 35,
         height: 18,
-        alignSelf: 'flex-end'
-      },
+        alignSelf: 'flex-end',
+    },
 
-      inactive: {
-        backgroundColor: 'red',
+    inactive: {
+        backgroundColor: colors.error,
         width: 35,
         height: 18,
-        alignSelf: 'flex-start'
-      },
+        alignSelf: 'flex-start',
+    },
 
-      buttonText: {
-        color: '#fff',
+    buttonText: {
+        color: colors.text.primary,
         fontWeight: 'bold',
         fontSize: 10,
-      },
+    },
 
-      accountToggle:
-      {
+    accountToggle: {
         width: 45,
-        backgroundColor: 'rgba(0, 0, 0, .2)',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
         borderRadius: 40,
         position: 'absolute',
         right: 10,
         padding: 1,
         borderWidth: 2,
-        borderColor: 'rgba(0, 0, 0, .2)',
-        elevation: 1
-      },
+        borderColor: colors.border,
+        elevation: 1,
+    },
 
-      editingOverlay: {
+    editingOverlay: {
         position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-      },
-
-    })
+        backgroundColor: colors.overlay,
+    },
+});
