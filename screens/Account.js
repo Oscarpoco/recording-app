@@ -327,7 +327,9 @@ export const styles = StyleSheet.create({
         width: 50,
         height: 50,
         backgroundColor: 'rgba(0, 0, 0, .7)',
-        borderRadius: 35
+        borderRadius: 35,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
 
     editProfileParent: {

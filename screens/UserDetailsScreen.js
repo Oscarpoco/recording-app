@@ -141,12 +141,13 @@ const UserDetailsScreen = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "rgba(255, 255, 255, .3)",
+    backgroundColor: "rgba(0, 0, 0, 1)",
     width: "100%",
     height: "100%",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
   },
+
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -160,6 +161,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     color: "rgba(255, 255, 255, .7)",
   },
+
   form: {
     padding: 20,
   },
@@ -239,7 +241,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   cancelButtonText: {
-    color: "#000",
+    color: "#fff",
     fontSize: 16,
     fontWeight: "500",
   },
