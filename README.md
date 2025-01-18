@@ -41,8 +41,7 @@ A cross-platform mobile recording application built with React Native and Expo, 
 - Node.js (v16 or higher)
 - npm or yarn
 - Expo CLI (`npm install -g expo-cli`)
-- iOS Simulator (Mac only) or Android Emulator
-- Physical device with Expo Go app (optional)
+- Physical device with Expo Go app 
 
 ### Setup Steps
 
@@ -78,19 +77,6 @@ A cross-platform mobile recording application built with React Native and Expo, 
    npm run web
    ```
 
-## 🏗️ Project Structure
-
-```
-recording-app/
-├── src/
-│   ├── components/       # Reusable UI components
-│   ├── screens/         # App screens
-│   ├── hooks/          # Custom React hooks
-│   ├── utils/          # Utility functions
-│   └── constants/      # App constants
-├── assets/             # Static assets
-└── App.js             # Root component
-```
 
 ## 📱 Usage
 
@@ -104,7 +90,6 @@ recording-app/
 - View all recordings in the main list
 - Tap a recording to play/pause
 - Use the share button to export recordings
-- Swipe left on a recording to delete
 
 ### Sharing Recordings
 1. Select a recording from the list
