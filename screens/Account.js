@@ -293,11 +293,11 @@ export default function Account(
 }
 
 const colors = {
-    primary: '#2563EB',           // Rich blue
+    primary: '#333',           // Rich blue
     secondary: '#1E293B',         // Dark slate
     accent: '#3B82F6',           // Bright blue
-    background: '#0F172A',        // Deep navy
-    surface: '#1E293B',          // Slate blue
+    background: '#000',        // Deep navy
+    surface: '#000',          // Slate blue
     text: {
         primary: '#F8FAFC',      // Almost white
         secondary: '#CBD5E1',    // Light gray
@@ -306,7 +306,7 @@ const colors = {
     border: '#334155',           // Medium slate
     success: '#10B981',          // Green
     error: '#EF4444',           // Red
-    overlay: 'rgba(15, 23, 42, 0.9)' // Dark overlay
+    overlay: 'rgba(0, 0, 0, 1)' // Dark overlay
 };
 
 export const styles = StyleSheet.create({
@@ -423,7 +423,7 @@ export const styles = StyleSheet.create({
         right: 0,
         width: 40,
         height: 40,
-        backgroundColor: colors.primary,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
@@ -441,7 +441,7 @@ export const styles = StyleSheet.create({
         right: 30,
         width: 40,
         height: 40,
-        backgroundColor: colors.primary,
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
@@ -530,7 +530,7 @@ export const styles = StyleSheet.create({
     accountChildContentItemButtonIcon: {
         width: 30,
         height: 30,
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'rgba(255, 255, 255, 0.7)',
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 50,

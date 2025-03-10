@@ -618,13 +618,7 @@ const loadSavedPhotos = async (userInformation) => {
  
   const startRecording = async () => {
     if (!title) {
-      Toast.show({
-        type: 'error',
-        text1: 'Warning',
-        text2: 'Please enter a title to start recording.',
-        position: 'bottom',
-      });
-      return;
+      setTitle('rec');
     }
   
     try {
