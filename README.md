@@ -63,19 +63,11 @@ A cross-platform mobile recording application built with React Native and Expo, 
    npm start
    # or
    yarn start
+
+   # Open expo go App and scan the QR on Terminal
    ```
 
-4. **Run on Platform**
-   ```bash
-   # iOS
-   npm run ios
-   
-   # Android
-   npm run android
-   
-   # Web
-   npm run web
-   ```
+
 
 
 ## 📱 Usage
